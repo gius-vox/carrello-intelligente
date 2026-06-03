@@ -117,9 +117,23 @@ st.markdown("""
     </div>
 """, unsafe_allow_html=True)
 
-cerca_testo = st.text_input("Digita qui cosa stai cercando...", placeholder="Scrivi qui il nome del farmaco (es. Tachipirina, Polase, Aboca, Avene, Durex)...", label_visibility="collapsed")
+# --- SEZIONE: RICERCA PRODOTTO ---
+st.markdown("""
+<div class="title-with-icon">
+    <span style="font-size: 20px;">🔍 Cerca un prodotto nel database (300+ disponibili):</span>
+</div>
+""", unsafe_allow_html=True)
 
-if cerca_testo:
+# Recuperiamo la lista unica di tutti i farmaci disponibili nel dataframe dei prezzi
+lista_prodotti = sorted(df_prezzi["Prodotto"].unique().tolist())
+
+# Usiamo la selectbox con un'opzione vuota all'inizio per simulare una barra di ricerca pulita
+cerca_testo = st.selectbox(
+    "Digita o seleziona cosa stai cercando...",
+    options=[""] + lista_prodotti,
+    index=0,
+    placeholder="Scrivi qui il nome del farmaco (es. Tachipirina...)"
+)
     df_trovati = df_prezzi[df_prezzi["Prodotto"].str.contains(cerca_testo, case=False)]
     if not df_trovati.empty:
         st.write(f"Prodotti trovati ({len(df_trovati)}):")

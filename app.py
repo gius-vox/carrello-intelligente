@@ -93,6 +93,30 @@ else:
     st.error("Errore critico: File 'prodotti.csv' non trovato. Assicurati di averlo caricato su GitHub insieme ad app.py.")
     st.stop()
 
+# Rilevamento automatico delle colonne delle farmacie presenti nel tuo CSV
+nomi_farmacie = [col for col in df_prezzi.columns if col not in ["Prodotto", "Immagine"]]
+
+# Dizionario di fallback per le spedizioni basato sul nome delle colonne
+regole_spedizione_base = {
+    "Igea": {"spedizione_fissa": 4.90, "soglia_gratis": 49.00},
+    "Loreto": {"spedizione_fissa": 3.90, "soglia_gratis": 39.90},
+    "Raven": {"spedizione_fissa": 5.90, "soglia_gratis": 29.90},
+    "DrMax": {"spedizione_fissa": 4.50, "soglia_gratis": 59.90},
+    "Farmacia Igea": {"spedizione_fissa": 4.90, "soglia_gratis": 49.00},
+    "Farmacia Loreto": {"spedizione_fissa": 3.90, "soglia_gratis": 39.90},
+    "Farmacia Raven": {"spedizione_fissa": 5.90, "soglia_gratis": 29.90},
+    "Dr. Max": {"spedizione_fissa": 4.50, "soglia_gratis": 59.90}
+}
+
+# Associa dinamicamente le regole alle colonne trovate nel tuo file CSV
+farmacie_info = {}
+for col in nomi_farmacie:
+    if col in regole_spedizione_base:
+        farmacie_info[col] = regole_spedizione_base[col]
+    else:
+        # Valori di default se la colonna ha un nome imprevisto
+        farmacie_info[col] = {"spedizione_fissa": 4.50, "soglia_gratis": 49.00}
+
 # Set state iniziale con prodotti reali presenti nel CSV
 if "carrello_spesa" not in st.session_state:
     st.session_state.carrello_spesa = [
@@ -100,14 +124,6 @@ if "carrello_spesa" not in st.session_state:
         "La Roche-Posay Anthelios XL 50+",
         "Tachipirina 1000mg Orosolubile 12 cpr"
     ]
-
-# Regole Spedizioni Farmacie
-farmacie_info = {
-    "Farmacia Igea": {"spedizione_fissa": 4.90, "soglia_gratis": 49.00},
-    "Farmacia Loreto": {"spedizione_fissa": 3.90, "soglia_gratis": 39.90},
-    "Farmacia Raven": {"spedizione_fissa": 5.90, "soglia_gratis": 29.90},
-    "Dr. Max": {"spedizione_fissa": 4.50, "soglia_gratis": 59.90}
-}
 
 # --- SEZIONE: RICERCA PRODOTTO (Stile Trovaprezzi) ---
 st.markdown("""
@@ -137,9 +153,8 @@ if cerca_testo != "":
             prod = row["Prodotto"]
             img_url = row["Immagine"]
             
-            # Calcolo dinamico del prezzo migliore tra le farmacie
-            colonne_farmacie = [c for c in farmacie_info.keys() if c in df_prezzi.columns]
-            prezzi_prodotto = row[colonne_farmacie].to_dict()
+            # Calcolo dinamico del prezzo migliore tra le farmacie reali del CSV
+            prezzi_prodotto = row[nomi_farmacie].to_dict()
             farmacia_migliore = min(prezzi_prodotto, key=prezzi_prodotto.get)
             prezzo_migliore = prezzi_prodotto[farmacia_migliore]
             
@@ -179,10 +194,13 @@ st.markdown("""
 </div>
 """, unsafe_allow_html=True)
 
+# Assicuriamoci che i prodotti di default esistano davvero nel CSV per evitare altri KeyError visivi
+prodotti_validi_default = [p for p in st.session_state.carrello_spesa if p in df_prezzi["Prodotto"].values]
+
 prodotti_selezionati = st.multiselect(
     "Puoi rimuovere gli elementi cliccando sulla 'x':",
     options=df_prezzi["Prodotto"].tolist(),
-    default=st.session_state.carrello_spesa,
+    default=prodotti_validi_default,
     label_visibility="visible"
 )
 st.session_state.carrello_spesa = prodotti_selezionati
@@ -190,11 +208,11 @@ st.session_state.carrello_spesa = prodotti_selezionati
 # --- CORE ALGORITMO DI SPLIT ---
 if prodotti_selezionati:
     df_filtrato = df_prezzi[df_prezzi["Prodotto"].isin(prodotti_selezionati)]
-    nomi_farmacie = list(farmacie_info.keys())
     
     # Calcolo opzioni singole tradizionali
     risultati_singoli = []
-    for nome_farmacia, regole in farmacie_info.items():
+    for nome_farmacia in nomi_farmacie:
+        regole = farmacie_info[nome_farmacia]
         totale_prodotti = float(df_filtrato[nome_farmacia].sum())
         costo_spedizione = 0.0 if totale_prodotti >= regole["soglia_gratis"] else regole["spedizione_fissa"]
         totale_complessivo = totale_prodotti + costo_spedizione

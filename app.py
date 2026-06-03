@@ -16,7 +16,7 @@ st.markdown("""
         font-family: 'Helvetica Neue', Arial, sans-serif !important;
     }
     
-    /* CARD STANDARD */
+    /* CARD STANDARD ORE 1-2-3 */
     .farmacia-card {
         background-color: #ffffff !important;
         border: 1px solid #e2e8f0 !important;
@@ -54,10 +54,20 @@ st.markdown("""
         border-radius: 14px !important;
         margin-bottom: 20px !important;
     }
+
+    /* Helper allineamento icone nei titoli */
+    .title-with-icon {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        color: #1e3a8a;
+        font-weight: 700;
+        margin-bottom: 15px;
+    }
     </style>
 """, unsafe_allow_html=True)
 
-# 3. Logo Definitivo (La F Dinamica Tech)
+# 3. Logo Brand (La F Dinamica Tech)
 st.components.v1.html("""
 <div style="display: flex; justify-content: center; align-items: center; margin-bottom: 10px;">
 <svg width="90" height="90" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -84,9 +94,9 @@ st.markdown("""
 
 st.write("---")
 
-# Impostiamo di default un carrello misto che include anche prodotti dai prezzi molto contrastanti
+# Session state per preservare il carrello
 if "carrello_spesa" not in st.session_state:
-    st.session_state.carrello_spesa = ["💅 Swisse Capelli Pelle Unghie 60 tav", "🥄 Magnesio Supremo Polvere 300g", "🌿 Arnica Gel Forte 30% 100ml"]
+    st.session_state.carrello_spesa = ["Armolipid Plus (Colesterolo) 60 cpr", "Supradyn Ricarica 60 cpr effervescenti", "Somatoline Snellente 7 Notti 400ml"]
 
 # Regole Spedizioni Farmacie
 farmacie_info = {
@@ -96,14 +106,14 @@ farmacie_info = {
     "Dr. Max": {"spedizione_fissa": 4.50, "soglia_gratis": 59.90}
 }
 
-# Database prodotti
+# Database prodotti (Pulito dalle emoji nel testo)
 database_prezzi = {
     "Prodotto": [
-        "❤️ Armolipid Plus (Colesterolo) 60 cpr", "🧪 Multicentrum Adulti 90 cpr", "💅 Swisse Capelli Pelle Unghie 60 tav", 
-        "🌿 Arnica Gel Forte 30% 100ml", "❄️ Oscillococcinum Omeopatico 30 dosi", "🦠 Enterogermina Immuno Fermenti 20 cpr",
-        "⚡ Supradyn Ricarica 60 cpr effervescenti", "🥄 Magnesio Supremo Polvere 300g", "🍊 Massigen Magnesio e Potassio 30 buste",
-        "🧴 Somatoline Snellente 7 Notti 400ml", "💧 Bionike Defence Hydra Crema 50ml", "✨ Rilastil Crema Smagliature 200ml",
-        "☀️ Eucerin Sun Fluid Viso 50+", "🌼 Heel Arnica Comp-Heel Omeopatico 50 tav", "🧠 Boiron Sedatif PC Ansia/Sonno 90 cpr"
+        "Armolipid Plus (Colesterolo) 60 cpr", "Multicentrum Adulti 90 cpr", "Swisse Capelli Pelle Unghie 60 tav", 
+        "Arnica Gel Forte 30% 100ml", "Oscillococcinum Omeopatico 30 dosi", "Enterogermina Immuno Fermenti 20 cpr",
+        "Supradyn Ricarica 60 cpr effervescenti", "Magnesio Supremo Polvere 300g", "Massigen Magnesio e Potassio 30 buste",
+        "Somatoline Snellente 7 Notti 400ml", "Bionike Defence Hydra Crema 50ml", "Rilastil Crema Smagliature 200ml",
+        "Eucerin Sun Fluid Viso 50+", "Arnica Comp-Heel Omeopatico 50 tav", "Boiron Sedatif PC Ansia/Sonno 90 cpr"
     ],
     "Immagine": [
         "https://cdn-icons-png.flaticon.com/512/3024/3024613.png", "https://cdn-icons-png.flaticon.com/512/4341/4341147.png",
@@ -115,7 +125,6 @@ database_prezzi = {
         "https://cdn-icons-png.flaticon.com/512/2917/2917633.png", "https://cdn-icons-png.flaticon.com/512/4341/4341071.png",
         "https://cdn-icons-png.flaticon.com/512/1047/1047683.png"
     ],
-    # Modificati leggermente alcuni valori per innescare combinazioni matematiche di split più frequenti
     "Farmacia Igea": [32.90, 19.80, 16.50, 11.20, 28.40, 14.50, 22.90, 18.50, 11.90, 39.90, 16.20, 26.80, 15.90, 12.50, 13.40],
     "Farmacia Loreto": [31.50, 20.50, 15.90, 12.40, 27.90, 13.90, 21.80, 17.90, 9.90, 38.50, 15.50, 24.90, 14.20, 11.90, 12.80],
     "Farmacie Raven": [33.50, 19.50, 16.90, 9.50, 28.90, 14.20, 23.10, 18.20, 10.50, 39.00, 15.90, 25.50, 15.10, 12.20, 13.10],
@@ -123,9 +132,15 @@ database_prezzi = {
 }
 df_prezzi = pd.DataFrame(database_prezzi)
 
-# --- SEZIONE: RICERCA PRODOTTO ---
-st.markdown("### 🔍 Cerca un prodotto da aggiungere:")
-cerca_testo = st.text_input("Digita qui cosa stai cercando...", placeholder="🔎 Scrivi qui il nome del farmaco...", label_visibility="collapsed")
+# --- SEZIONE: RICERCA PRODOTTO (Icona Lente SVG) ---
+st.markdown("""
+    <div class="title-with-icon">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#0288d1" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+        <span style="font-size: 20px;">Cerca un prodotto da aggiungere:</span>
+    </div>
+""", unsafe_allow_html=True)
+
+cerca_testo = st.text_input("Digita qui cosa stai cercando...", placeholder="Scrivi qui il nome del farmaco...", label_visibility="collapsed")
 
 if cerca_testo:
     df_trovati = df_prezzi[df_prezzi["Prodotto"].str.contains(cerca_testo, case=False)]
@@ -142,17 +157,23 @@ if cerca_testo:
             with col_btn:
                 st.markdown("<div style='padding-top: 4px;'>", unsafe_allow_html=True)
                 if prod in st.session_state.carrello_spesa:
-                    st.button("✅ Incluso", key=f"btn_in_{index}", disabled=True)
+                    st.button("Incluso", key=f"btn_in_{index}", disabled=True)
                 else:
-                    if st.button("🛒 Aggiungi", key=f"btn_add_{index}"):
+                    if st.button("Aggiungi", key=f"btn_add_{index}"):
                         st.session_state.carrello_spesa.append(prod)
                         st.rerun()
                 st.markdown("</div>", unsafe_allow_html=True)
 
 st.write("---")
 
-# Riepilogo del carrello
-st.markdown("### 🛍️ Il tuo carrello attuale:")
+# Riepilogo del carrello (Icone Borsa SVG)
+st.markdown("""
+    <div class="title-with-icon">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#1e3a8a" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"></path><line x1="3" y1="6" x2="21" y2="6"></line><path d="M16 10a4 4 0 0 1-8 0"></path></svg>
+        <span style="font-size: 20px;">Il tuo carrello attuale:</span>
+    </div>
+""", unsafe_allow_html=True)
+
 prodotti_selezionati = st.multiselect(
     "Puoi rimuovere gli elementi cliccando sulla 'x':",
     options=df_prezzi["Prodotto"].tolist(),
@@ -173,9 +194,9 @@ if prodotti_selezionati:
         costo_spedizione = 0.0 if totale_prodotti >= regole["soglia_gratis"] else regole["spedizione_fissa"]
         totale_complessivo = totale_prodotti + costo_spedizione
         
-        info_sped = "<span style='color: #22c55e; font-weight: bold;'>Spedizione GRATIS 🎉</span>" if costo_spedizione == 0 else f"<span style='color: #ef4444; font-weight: bold;'>Spedizione: +{costo_spedizione:.2f} €</span>"
+        info_sped = "<span style='color: #22c55e; font-weight: bold;'>Spedizione GRATIS</span>" if costo_spedizione == 0 else f"<span style='color: #ef4444; font-weight: bold;'>Spedizione: +{costo_spedizione:.2f} €</span>"
         mancante = regole["soglia_gratis"] - totale_prodotti
-        suggerimento = f"<div style='background-color: #fef08a; border-left: 4px solid #facc15; padding: 10px; font-size: 12px; border-radius: 6px; margin-top: 8px; color: #713f12;'>🎯 Ti mancano solo <b>{mancante:.2f}€</b> per la spedizione gratis!</div>" if (0 < mancante <= 15.00) else ""
+        suggerimento = f"<div style='background-color: #fef08a; border-left: 4px solid #facc15; padding: 10px; font-size: 12px; border-radius: 6px; margin-top: 8px; color: #713f12;'>Target: Ti mancano solo <b>{mancante:.2f}€</b> per la spedizione gratis!</div>" if (0 < mancante <= 15.00) else ""
 
         risultati_singoli.append({
             "Farmacia": nome_farmacia, "Totale_Prodotti": totale_prodotti,
@@ -204,24 +225,30 @@ if prodotti_selezionati:
                     costo_sped = 0.0 if tot_prod >= farmacie_info[f]["soglia_gratis"] else farmacie_info[f]["spedizione_fissa"]
                     costo_corrente += (tot_prod + costo_sped)
             
-            if costo_corrente < best_split_cost - 0.10: # Almeno 10 centesimi di risparmio effettivo
+            if costo_corrente < best_split_cost - 0.10:
                 best_split_cost = costo_corrente
                 best_split_arrangement = partizione
 
-    # --- VISUALIZZAZIONE SEZIONE INTELLIGENTE ---
-    st.markdown("### 🧠 Analisi Co-Spedizione e Split:")
+    # --- VISUALIZZAZIONE SEZIONE INTELLIGENTE (Icona Lampadina SVG) ---
+    st.write("")
+    st.markdown("""
+        <div class="title-with-icon">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#0288d1" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M15 14c.2-1 .7-1.7 1.5-2.5 1-.9 1.5-2.2 1.5-3.5A5 5 0 0 0 8 8c0 1.3.5 2.6 1.5 3.5.8.8 1.3 1.5 1.5 2.5"></path><line x1="9" y1="18" x2="15" y2="18"></line><line x1="10" y1="22" x2="14" y2="22"></line></svg>
+            <span style="font-size: 20px;">Strategia d'Acquisto Intelligente:</span>
+        </div>
+    """, unsafe_allow_html=True)
 
     if best_split_arrangement:
         risparmio_netto = miglior_singolo - best_split_cost
         st.markdown(f"""
             <div class="split-card">
                 <div style="font-size: 28px; font-weight: 800; float: right; color: #0288d1;">{best_split_cost:.2f} €</div>
-                <div style="font-size: 20px; font-weight: 900; color: #1e3a8a;">🚀 Super Fiuto: Conviene Dividere il Carrello!</div>
-                <div style="font-size: 15px; color: #166534; font-weight: 700; margin-top: 5px; background-color: #dcfce7; display: inline-block; padding: 3px 8px; border-radius: 4px;">
-                    🔥 Risparmi extra {risparmio_netto:.2f} € rispetto a un negozio unico!
+                <div style="font-size: 20px; font-weight: 900; color: #1e3a8a;">Ottimizzazione: conviene dividere l'ordine</div>
+                <div style="font-size: 14px; color: #166534; font-weight: 700; margin-top: 5px; background-color: #dcfce7; display: inline-block; padding: 4px 10px; border-radius: 6px;">
+                    Risparmio extra: {risparmio_netto:.2f} € rispetto a un negozio unico
                 </div>
                 <div style="margin-top: 15px; font-size: 14px; color: #334155; margin-bottom: 10px;">
-                    <b>Ripartizione consigliata:</b>
+                    <b>Ripartizione consigliata nei carrelli:</b>
                 </div>
             </div>
         """, unsafe_allow_html=True)
@@ -233,42 +260,59 @@ if prodotti_selezionati:
                     prezzo_p = df_filtrato[df_filtrato["Prodotto"] == p][farmacia].values[0]
                     st.markdown(f"- {p} ({prezzo_p:.2f} €)")
     else:
-        # Se lo split non conviene, la card compare comunque ma spiega il motivo matematico!
         st.markdown(f"""
             <div class="split-card-info">
-                <div style="font-size: 18px; font-weight: bold; color: #475569;">🔍 Controllo Combinatorio Eseguito</div>
-                <p style="font-size: 14px; color: #64748b; margin-top: 6px; margin-bottom: 0;">
-                    L'algoritmo ha simulato tutti i possibili split di magazzino. Dividere il carrello <b>non conviene</b> perché i costi di spedizione aggiuntivi supererebbero il risparmio sui singoli prodotti. La scelta ottimale è acquistare tutto su <b>{nome_miglior_singolo}</b>.
+                <div style="font-size: 16px; font-weight: bold; color: #475569; display: flex; align-items: center; gap: 8px;">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#475569" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
+                    Controllo combinatorio eseguito
+                </div>
+                <p style="font-size: 14px; color: #64748b; margin-top: 6px; margin-bottom: 0; line-height: 1.4;">
+                    L'algoritmo ha verificato ogni combinazione di split. Dividere l'ordine non conviene: le spese di spedizione aggiuntive supererebbero il risparmio sui farmaci. La scelta ottimale è acquistare tutto su <b>{nome_miglior_singolo}</b>.
                 </p>
             </div>
         """, unsafe_allow_html=True)
 
     st.write("---")
 
-    # Elenco tradizionale unico negozio
-    st.markdown("#### 📋 Comprare tutto da un'unica farmacia:")
+    # Elenco tradizionale unico negozio (Icona Elenco/Check SVG)
+    st.markdown("""
+        <div class="title-with-icon">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#1e3a8a" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="8" y1="6" x2="21" y2="6"></line><line x1="8" y1="12" x2="21" y2="12"></line><line x1="8" y1="18" x2="21" y2="18"></line><line x1="3" y1="6" x2="3.01" y2="6"></line><line x1="3" y1="12" x2="3.01" y2="12"></line><line x1="3" y1="18" x2="3.01" y2="18"></line></svg>
+            <span style="font-size: 20px;">Ordinare da un'unica farmacia:</span>
+        </div>
+    """, unsafe_allow_html=True)
+
     for i, row in enumerate(df_risultati_singoli.itertuples()):
         is_vincitore = (i == 0 and not best_split_arrangement)
         card_class = "vincitore-card" if is_vincitore else "farmacia-card"
         prezzo_color = "#22c55e" if is_vincitore else "#1e3a8a"
-        badge = "👑" if i == 0 else "🥈" if i == 1 else "🥉" if i == 2 else "📋"
         
+        # Generazione scudetti numerici minimal in formato SVG al posto dei podi amatoriali
+        if i == 0:
+            badge_svg = '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#22c55e" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" style="margin-right:8px;"><circle cx="12" cy="12" r="10"></circle><path d="M12 16V8M10 10l2-2"></path></svg>'
+        elif i == 1:
+            badge_svg = '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#64748b" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="margin-right:8px;"><circle cx="12" cy="12" r="10"></circle><path d="M10 16h4M10 10a2 2 0 0 1 4 0c0 .7-.5 1.2-1 1.5L10 14h4"></path></svg>'
+        else:
+            badge_svg = '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right:8px;"><circle cx="12" cy="12" r="10"></circle><path d="M10 10a2 2 0 0 1 4 0c0 .7-.5 1.2-1 1.5L11 13h3M10 16h4"></path></svg>'
+
         st.markdown(f"""
             <div class="{card_class}">
                 <div style="font-size: 24px; font-weight: 800; float: right; color: {prezzo_color};">{row.Prezzo_Finale:.2f} €</div>
-                <div style="font-size: 17px; font-weight: bold; color: #1e3a8a;">{badge} {row.Farmacia}</div>
-                <div style="font-size: 13px; color: #64748b; margin-top: 4px;">
+                <div style="font-size: 17px; font-weight: bold; color: #1e3a8a; display: flex; align-items: center;">
+                    {badge_svg} {row.Farmacia}
+                </div>
+                <div style="font-size: 13px; color: #64748b; margin-top: 6px;">
                     Prodotti: {row.Totale_Prodotti:.2f} € | {row.Info_Spedizione}
                 </div>
                 {row.Suggerimento}
             </div>
         """, unsafe_allow_html=True)
         
-        with st.expander(f"📄 Vedi i singoli prezzi di {row.Farmacia}"):
+        with st.expander(f"Dettaglio listino prezzi {row.Farmacia}"):
             df_singolo = df_filtrato[["Prodotto", row.Farmacia]].copy()
             df_singolo.columns = ["Prodotto Selezionato", "Prezzo Singolo"]
             df_singolo["Prezzo Singolo"] = df_singolo["Prezzo Singolo"].map('{:.2f} €'.format)
             st.dataframe(df_singolo.set_index("Prodotto Selezionato"), use_container_width=True)
             
 else:
-    st.info("Il tuo carrello è vuoto. Cerca un prodotto in alto e clicca su 'Aggiungi' per attivare l'analisi dei prezzi.")
+    st.info("Il tuo carrello è vuoto. Cerca un prodotto in alto per attivare l'analisi dei prezzi.")

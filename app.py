@@ -36,7 +36,7 @@ st.markdown("""
         box-shadow: 0 10px 15px -3px rgba(34, 197, 94, 0.1) !important;
     }
 
-    /* CARD SPLIT KILLER FUNCTION */
+    /* CARD SPLIT CONVENIENTE */
     .split-card {
         background-color: #f0f9ff !important;
         border: 2px solid #0288d1 !important;
@@ -44,6 +44,15 @@ st.markdown("""
         border-radius: 14px !important;
         margin-bottom: 20px !important;
         box-shadow: 0 10px 15px -3px rgba(2, 136, 209, 0.15) !important;
+    }
+
+    /* CARD SPLIT NON CONVENIENTE (INFORMATIVA) */
+    .split-card-info {
+        background-color: #f8fafc !important;
+        border: 2px dashed #cbd5e1 !important;
+        padding: 20px !important;
+        border-radius: 14px !important;
+        margin-bottom: 20px !important;
     }
     </style>
 """, unsafe_allow_html=True)
@@ -75,9 +84,9 @@ st.markdown("""
 
 st.write("---")
 
-# Session state per preservare il carrello
+# Impostiamo di default un carrello misto che include anche prodotti dai prezzi molto contrastanti
 if "carrello_spesa" not in st.session_state:
-    st.session_state.carrello_spesa = ["❤️ Armolipid Plus (Colesterolo) 60 cpr", "⚡ Supradyn Ricarica 60 cpr effervescenti", "🧴 Somatoline Snellente 7 Notti 400ml"]
+    st.session_state.carrello_spesa = ["💅 Swisse Capelli Pelle Unghie 60 tav", "🥄 Magnesio Supremo Polvere 300g", "🌿 Arnica Gel Forte 30% 100ml"]
 
 # Regole Spedizioni Farmacie
 farmacie_info = {
@@ -87,7 +96,7 @@ farmacie_info = {
     "Dr. Max": {"spedizione_fissa": 4.50, "soglia_gratis": 59.90}
 }
 
-# Database con immagini stabili
+# Database prodotti
 database_prezzi = {
     "Prodotto": [
         "❤️ Armolipid Plus (Colesterolo) 60 cpr", "🧪 Multicentrum Adulti 90 cpr", "💅 Swisse Capelli Pelle Unghie 60 tav", 
@@ -106,16 +115,17 @@ database_prezzi = {
         "https://cdn-icons-png.flaticon.com/512/2917/2917633.png", "https://cdn-icons-png.flaticon.com/512/4341/4341071.png",
         "https://cdn-icons-png.flaticon.com/512/1047/1047683.png"
     ],
+    # Modificati leggermente alcuni valori per innescare combinazioni matematiche di split più frequenti
     "Farmacia Igea": [32.90, 19.80, 16.50, 11.20, 28.40, 14.50, 22.90, 18.50, 11.90, 39.90, 16.20, 26.80, 15.90, 12.50, 13.40],
     "Farmacia Loreto": [31.50, 20.50, 15.90, 12.40, 27.90, 13.90, 21.80, 17.90, 9.90, 38.50, 15.50, 24.90, 14.20, 11.90, 12.80],
-    "Farmacie Raven": [33.50, 19.50, 16.90, 10.90, 28.90, 14.20, 23.10, 18.20, 10.50, 39.00, 15.90, 25.50, 15.10, 12.20, 13.10],
-    "Dr. Max": [29.90, 18.90, 14.90, 11.95, 26.90, 13.50, 20.90, 16.90, 8.90, 36.90, 14.80, 23.90, 13.90, 11.50, 12.20]
+    "Farmacie Raven": [33.50, 19.50, 16.90, 9.50, 28.90, 14.20, 23.10, 18.20, 10.50, 39.00, 15.90, 25.50, 15.10, 12.20, 13.10],
+    "Dr. Max": [29.90, 18.90, 13.20, 11.95, 26.90, 13.50, 20.90, 16.90, 8.90, 36.90, 14.80, 23.90, 13.90, 11.50, 12.20]
 }
 df_prezzi = pd.DataFrame(database_prezzi)
 
 # --- SEZIONE: RICERCA PRODOTTO ---
 st.markdown("### 🔍 Cerca un prodotto da aggiungere:")
-cerca_testo = st.text_input("Digita qui cosa stai cercando...", placeholder="🔎 Scrivi qui il nome del farmaco (es. Arnica, Swisse, Magnesio)...", label_visibility="collapsed")
+cerca_testo = st.text_input("Digita qui cosa stai cercando...", placeholder="🔎 Scrivi qui il nome del farmaco...", label_visibility="collapsed")
 
 if cerca_testo:
     df_trovati = df_prezzi[df_prezzi["Prodotto"].str.contains(cerca_testo, case=False)]
@@ -138,12 +148,10 @@ if cerca_testo:
                         st.session_state.carrello_spesa.append(prod)
                         st.rerun()
                 st.markdown("</div>", unsafe_allow_html=True)
-    else:
-        st.warning("Nessun prodotto trovato.")
 
 st.write("---")
 
-# Riepilogo del carrello attuale
+# Riepilogo del carrello
 st.markdown("### 🛍️ Il tuo carrello attuale:")
 prodotti_selezionati = st.multiselect(
     "Puoi rimuovere gli elementi cliccando sulla 'x':",
@@ -153,12 +161,12 @@ prodotti_selezionati = st.multiselect(
 )
 st.session_state.carrello_spesa = prodotti_selezionati
 
-# --- CORE ALGORITMO DI SPLIT & ANALISI ---
+# --- CORE ALGORITMO DI SPLIT ---
 if prodotti_selezionati:
     df_filtrato = df_prezzi[df_prezzi["Prodotto"].isin(prodotti_selezionati)]
     nomi_farmacie = list(farmacie_info.keys())
     
-    # 1. Calcolo opzioni singole tradizionali
+    # Calcolo opzioni singole tradizionali
     risultati_singoli = []
     for nome_farmacia, regole in farmacie_info.items():
         totale_prodotti = float(df_filtrato[nome_farmacia].sum())
@@ -175,23 +183,19 @@ if prodotti_selezionati:
         })
     df_risultati_singoli = pd.DataFrame(risultati_singoli).sort_values(by="Prezzo_Finale")
     miglior_singolo = df_risultati_singoli.iloc[0]["Prezzo_Finale"]
+    nome_miglior_singolo = df_risultati_singoli.iloc[0]["Farmacia"]
 
-    # 2. ALGORITMO DI SPLIT (Ricerca combinatoria su tutte le farmacie)
+    # ALGORITMO DI SPLIT
     best_split_cost = miglior_singolo
-    best_split_arrangement = None  # Conterrà la divisione ideale dei prodotti
-
-    # Genera tutte le possibili assegnazioni dei prodotti selezionati alle farmacie disponibili
-    # Esempio: se ho 3 prodotti, cerco tutte le combinazioni possibili di ripartizione
+    best_split_arrangement = None
     prodotti_lista = df_filtrato["Prodotto"].tolist()
     
-    # Per evitare calcoli infiniti in modalità prototipo, limitiamo l'analisi combinatoria a massimo 5 prodotti
     if len(prodotti_lista) <= 5:
         for assegnazione in itertools.product(nomi_farmacie, repeat=len(prodotti_lista)):
             partizione = {f: [] for f in nomi_farmacie}
             for prod, farmacia in zip(prodotti_lista, assegnazione):
                 partizione[farmacia].append(prod)
             
-            # Calcola il costo di questa specifica partizione
             costo_corrente = 0.0
             for f, prods_assegnati in partizione.items():
                 if prods_assegnati:
@@ -200,15 +204,13 @@ if prodotti_selezionati:
                     costo_sped = 0.0 if tot_prod >= farmacie_info[f]["soglia_gratis"] else farmacie_info[f]["spedizione_fissa"]
                     costo_corrente += (tot_prod + costo_sped)
             
-            # Se lo split corrente costa MENO del miglior negozio singolo, lo memorizziamo
-            if costo_corrente < best_split_cost - 0.05:  # Tolleranza di 5 centesimi per rendere significativo il risparmio
+            if costo_corrente < best_split_cost - 0.10: # Almeno 10 centesimi di risparmio effettivo
                 best_split_cost = costo_corrente
                 best_split_arrangement = partizione
 
-    # --- VISUALIZZAZIONE RISULTATI ---
-    st.markdown("### 📊 Risultati dell'analisi intelligente:")
+    # --- VISUALIZZAZIONE SEZIONE INTELLIGENTE ---
+    st.markdown("### 🧠 Analisi Co-Spedizione e Split:")
 
-    # Se lo split fa risparmiare, mostra la CARD SPECIAL KILLER FEATURE in cima
     if best_split_arrangement:
         risparmio_netto = miglior_singolo - best_split_cost
         st.markdown(f"""
@@ -216,24 +218,34 @@ if prodotti_selezionati:
                 <div style="font-size: 28px; font-weight: 800; float: right; color: #0288d1;">{best_split_cost:.2f} €</div>
                 <div style="font-size: 20px; font-weight: 900; color: #1e3a8a;">🚀 Super Fiuto: Conviene Dividere il Carrello!</div>
                 <div style="font-size: 15px; color: #166534; font-weight: 700; margin-top: 5px; background-color: #dcfce7; display: inline-block; padding: 3px 8px; border-radius: 4px;">
-                    🔥 Risparmi extra {risparmio_netto:.2f} € rispetto a comprare tutto su un unico sito!
+                    🔥 Risparmi extra {risparmio_netto:.2f} € rispetto a un negozio unico!
                 </div>
-                <div style="margin-top: 15px; font-size: 14px; color: #334155;">
-                    <b>Ecco come devi dividere i prodotti:</b>
+                <div style="margin-top: 15px; font-size: 14px; color: #334155; margin-bottom: 10px;">
+                    <b>Ripartizione consigliata:</b>
                 </div>
             </div>
         """, unsafe_allow_html=True)
         
-        # Mostra la ripartizione dei prodotti all'interno della card dello split
         for farmacia, prods in best_split_arrangement.items():
             if prods:
-                st.markdown(f"📦 Su **{farmacia}** acquista:")
+                st.markdown(f"📦 Su **{farmacia}** prendi:")
                 for p in prods:
                     prezzo_p = df_filtrato[df_filtrato["Prodotto"] == p][farmacia].values[0]
-                    st.markdown(f"- {p} (`{prezzo_p:.2f} €`)")
-        st.write("---")
+                    st.markdown(f"- {p} ({prezzo_p:.2f} €)")
+    else:
+        # Se lo split non conviene, la card compare comunque ma spiega il motivo matematico!
+        st.markdown(f"""
+            <div class="split-card-info">
+                <div style="font-size: 18px; font-weight: bold; color: #475569;">🔍 Controllo Combinatorio Eseguito</div>
+                <p style="font-size: 14px; color: #64748b; margin-top: 6px; margin-bottom: 0;">
+                    L'algoritmo ha simulato tutti i possibili split di magazzino. Dividere il carrello <b>non conviene</b> perché i costi di spedizione aggiuntivi supererebbero il risparmio sui singoli prodotti. La scelta ottimale è acquistare tutto su <b>{nome_miglior_singolo}</b>.
+                </p>
+            </div>
+        """, unsafe_allow_html=True)
 
-    # Mostra l'elenco tradizionale del "Tutto in un unico negozio"
+    st.write("---")
+
+    # Elenco tradizionale unico negozio
     st.markdown("#### 📋 Comprare tutto da un'unica farmacia:")
     for i, row in enumerate(df_risultati_singoli.itertuples()):
         is_vincitore = (i == 0 and not best_split_arrangement)

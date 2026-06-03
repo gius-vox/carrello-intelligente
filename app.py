@@ -1,92 +1,25 @@
 import streamlit as st
 import pandas as pd
 
-# 1. Impostazione della pagina
+# Impostazione della pagina nativa
 st.set_page_config(
     page_title="FiutaCarrello - Il fiuto intelligente per la tua spesa", 
     page_icon="🛒", 
     layout="centered"
 )
 
-# 2. Iniezione CSS globale per sovrascrivere il tema di default di Streamlit
+# Struttura con stili in linea (inline styles) per evitare che Streamlit li ignori
 st.markdown("""
-    <style>
-    /* Sovrascrive i font e i colori nativi di Streamlit a livello globale */
-    html, body, [data-testid="stMarkdownContainer"] p {
-        font-family: 'Helvetica Neue', Arial, sans-serif !important;
-    }
-    
-    /* Forza il colore Blu Notte sul titolo principale */
-    h1 {
-        color: #1a237e !important;
-        font-weight: 800 !important;
-        letter-spacing: -1px !important;
-        text-align: center !important;
-    }
-    
-    /* Colore del sottotitolo */
-    h3 {
-        color: #5c6bc0 !important;
-        font-weight: 400 !important;
-        text-align: center !important;
-        font-size: 1.2em !important;
-    }
-
-    /* CARD RISULTATI RIPULITE ED ELEGANTI */
-    .farmacia-card {
-        background-color: #ffffff !important;
-        border: 1px solid #e0e0e0 !important;
-        padding: 15px 20px !important;
-        border-radius: 12px !important;
-        margin-bottom: 16px !important;
-        box-shadow: 0 2px 4px rgba(0,0,0,0.02) !important;
-    }
-    
-    .vincitore-card {
-        background-color: #f4fbf7 !important;
-        border: 2px solid #00c853 !important;
-        padding: 18px 20px !important;
-        border-radius: 12px !important;
-        margin-bottom: 20px !important;
-        box-shadow: 0 4px 12px rgba(0,200,83,0.08) !important;
-    }
-    
-    .prezzo-tag {
-        font-size: 1.5em !important;
-        font-weight: bold !important;
-        float: right !important;
-        color: #1a237e !important;
-    }
-    
-    .prezzo-tag-vincitore {
-        font-size: 1.6em !important;
-        font-weight: bold !important;
-        float: right !important;
-        color: #00c853 !important;
-    }
-    
-    .sped-gratis { color: #00c853 !important; font-weight: bold !important; font-size: 0.9em !important; }
-    .sped-pagamento { color: #d32f2f !important; font-weight: bold !important; font-size: 0.9em !important; }
-    
-    .suggerimento-testo {
-        background-color: #fffde7 !important;
-        border-left: 4px solid #fdd835 !important;
-        padding: 8px 12px !important;
-        font-size: 0.85em !important;
-        border-radius: 4px !important;
-        margin-top: 8px !important;
-        margin-bottom: 8px !important;
-        color: #4e342e !important;
-    }
-    </style>
+    <div style="text-align: center; margin-top: 10px;">
+        <span style="font-size: 50px;">🐕 🔍 🛒</span>
+        <h1 style="color: #1a237e !important; font-family: 'Helvetica Neue', Arial, sans-serif; font-size: 45px; font-weight: 800; margin-top: 10px; margin-bottom: 5px;">
+            Fiuta<span style="color: #0288d1;">Carrello</span>
+        </h1>
+        <p style="color: #5c6bc0; font-family: 'Helvetica Neue', Arial, sans-serif; font-size: 16px; margin-top: 0; margin-bottom: 25px;">
+            L'algoritmo intelligente che scova la combinazione più economica e azzera le spese di spedizione
+        </p>
+    </div>
 """, unsafe_allow_html=True)
-
-# 3. Intestazione visiva mista (Nativa + HTML) per evitare blocchi
-st.markdown("<div style='text-align: center; font-size: 50px;'>🐕 🔍 🛒</div>", unsafe_allow_html=True)
-
-# Usiamo l'HTML diretto per il titolo combinato bi-colore
-st.markdown("<h1>Fiuta<span style='color: #0288d1;'>Carrello</span></h1>", unsafe_allow_html=True)
-st.markdown("<h3>L'algoritmo intelligente che scova la combinazione più economica e azzera le spese di spedizione</h3>", unsafe_allow_html=True)
 
 st.write("---")
 
@@ -113,7 +46,7 @@ database_prezzi = {
         "💧 Bionike Defence Hydra Crema 50ml",
         "✨ Rilastil Crema Smagliature 200ml",
         "☀️ Eucerin Sun Fluid Viso 50+",
-        "🌼 Heel Arnica Comp-Heel Omeopatico 50 tav",
+        "🌼 Heel Arnica Com-Heel Omeopatico 50 tav",
         "🧠 Boiron Sedatif PC Ansia/Sonno 90 cpr"
     ],
     "Farmacia Igea": [32.90, 19.80, 16.50, 11.20, 28.40, 14.50, 22.90, 18.50, 11.90, 39.90, 16.20, 26.80, 15.90, 12.50, 13.40],
@@ -143,13 +76,13 @@ if prodotti_selezionati:
         
         if mancante_per_gratis <= 0:
             costo_spedizione = 0.0
-            info_spedizione = "<span class='sped-gratis'>Spedizione GRATIS 🎉</span>"
+            info_spedizione = "<span style='color: #00c853; font-weight: bold;'>Spedizione GRATIS 🎉</span>"
             suggerimento = ""
         else:
             costo_spedizione = regole["spedizione_fissa"]
-            info_spedizione = f"<span class='sped-pagamento'>Spedizione: +{costo_spedizione:.2f} €</span> (soglia gratis a {regole['soglia_gratis']:.0f} €)"
+            info_spedizione = f"<span style='color: #d32f2f; font-weight: bold;'>Spedizione: +{costo_spedizione:.2f} €</span> (soglia gratis a {regole['soglia_gratis']:.0f} €)"
             if mancante_per_gratis <= 15.00:
-                suggerimento = f"🎯 <b>Il consiglio di FiutaCarrello:</b> Ti mancano solo <b>{mancante_per_gratis:.2f}€</b> per azzerare la spedizione su questo sito. Ti conviene aggiungere un piccolo prodotto per non sprecare soldi nella consegna!"
+                suggerimento = f"<div style='background-color: #fffde7; border-left: 4px solid #fdd835; padding: 8px 12px; font-size: 13px; border-radius: 4px; margin-top: 8px; color: #4e342e;'>🎯 <b>Il consiglio di FiutaCarrello:</b> Ti mancano solo <b>{mancante_per_gratis:.2f}€</b> per azzerare la spedizione su questo sito!</div>"
             else:
                 suggerimento = ""
                 
@@ -168,7 +101,7 @@ if prodotti_selezionati:
     st.write("")
     st.markdown("### 📊 Risultati dell'analisi:")
     
-    # Generazione dei riquadri
+    # Generazione delle card con stili inline rigidi
     for i, row in enumerate(df_risultati.itertuples()):
         is_vincitore = (i == 0)
         
@@ -177,18 +110,26 @@ if prodotti_selezionati:
         elif i == 2: badge = "🥉"
         else: badge = "📋"
         
-        card_class = "vincitore-card" if is_vincitore else "farmacia-card"
-        prezzo_class = "prezzo-tag-vincitore" if is_vincitore else "prezzo-tag"
-        suggerimento_html = f"<div class='suggerimento-testo'>{row.Suggerimento}</div>" if row.Suggerimento else ""
+        # Gestione stili differenziati inline per vincitore e altri
+        if is_vincitore:
+            bg_color = "#f4fbf7"
+            border_style = "2px solid #00c853"
+            prezzo_color = "#00c853"
+            shadow = "0 4px 12px rgba(0,200,83,0.08)"
+        else:
+            bg_color = "#ffffff"
+            border_style = "1px solid #e0e0e0"
+            prezzo_color = #1a237e"
+            shadow = "0 2px 4px rgba(0,0,0,0.02)"
         
         st.markdown(f"""
-            <div class="{card_class}">
-                <div class="{prezzo_class}">{row.Prezzo_Finale:.2f} €</div>
-                <div style="font-size: 1.1em; font-weight: bold; color: #1a237e;">{badge} {row.Farmacia}</div>
-                <div style="font-size: 0.9em; color: #555; margin-top: 4px;">
+            <div style="background-color: {bg_color}; border: {border_style}; padding: 18px 20px; border-radius: 12px; margin-bottom: 16px; box-shadow: {shadow}; font-family: Arial, sans-serif;">
+                <div style="font-size: 24px; font-weight: bold; float: right; color: {prezzo_color};">{row.Prezzo_Finale:.2f} €</div>
+                <div style="font-size: 18px; font-weight: bold; color: #1a237e;">{badge} {row.Farmacia}</div>
+                <div style="font-size: 14px; color: #555; margin-top: 6px;">
                     Prodotti: {row.Totale_Prodotti:.2f} € | {row.Info_Spedizione}
                 </div>
-                {suggerimento_html}
+                {row.Suggerimento}
             </div>
         """, unsafe_allow_html=True)
         

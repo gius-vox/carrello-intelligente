@@ -140,11 +140,25 @@ cerca_testo = st.selectbox(
         for index, row in df_trovati.iterrows():
             prod = row["Prodotto"]
             img_url = row["Immagine"]
+            
+            # Calcolo automatico della farmacia più conveniente per questo farmaco
+            colonne_farmacie = [c for c in df_prezzi.columns if c not in ["Prodotto", "Immagine"]]
+            prezzi_prodotto = row[colonne_farmacie].to_dict()
+            farmacia_migliore = min(prezzi_prodotto, key=prezzi_prodotto.get)
+            prezzo_migliore = prezzi_prodotto[farmacia_migliore]
+            
             col_img, col_text, col_btn = st.columns([1, 4, 2])
             with col_img:
                 st.image(img_url, width=45)
             with col_text:
-                st.markdown(f"<div style='padding-top: 10px; font-size: 15px; font-weight: 600; color: #1e3a8a;'>{prod}</div>", unsafe_allow_html=True)
+                st.markdown(f"""
+                    <div style='padding-top: 5px;'>
+                        <span style='font-size: 15px; font-weight: 600; color: #1e3a8a;'>{prod}</span>
+                        <span style='background-color: #d1fae5; color: #065f46; font-size: 11px; font-weight: bold; padding: 2px 6px; border-radius: 4px; margin-left: 8px;'>
+                            🔥 Miglior prezzo su {farmacia_migliore}: {prezzo_migliore:.2f}€
+                        </span>
+                    </div>
+                """, unsafe_allow_html=True)
             with col_btn:
                 st.markdown("<div style='padding-top: 4px;'>", unsafe_allow_html=True)
                 if prod in st.session_state.carrello_spesa:

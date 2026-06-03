@@ -47,15 +47,12 @@ st.markdown("""
     </style>
 """, unsafe_allow_html=True)
 
-# 3. Logo Definitivo (La F Dinamica Tech) inserito stabilmente
+# 3. Logo Definitivo (La F Dinamica Tech)
 st.markdown("""
 <div class="logo-container">
 <svg width="100" height="100" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
-    <!-- Cerchio di sfondo tech morbido -->
     <circle cx="50" cy="50" r="42" fill="#f1f5f9"/>
-    <!-- Lettera F fusa con scia dinamica -->
     <path d="M35 72V28H68M35 48H60" stroke="#1e3a8a" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/>
-    <!-- Simbolo del carrello minimale che taglia la F -->
     <path d="M52 65H68L74 48" stroke="#0288d1" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
     <circle cx="56" cy="74" r="3" fill="#0288d1"/>
     <circle cx="66" cy="74" r="3" fill="#0288d1"/>
@@ -122,7 +119,6 @@ prodotti_selezionati = st.multiselect(
 if prodotti_selezionati:
     df_filtrato = df_prezzi[df_prezzi["Prodotto"].isin(prodotti_selezionati)]
     
-    # Calcoli
     risultati = []
     for nome_farmacia, regole in farmacie_info.items():
         totale_prodotti = float(df_filtrato[nome_farmacia].sum())
@@ -142,11 +138,12 @@ if prodotti_selezionati:
                 
         totale_complessivo = totale_prodotti + costo_spedizione
         
+        # FIX: "Suggerimento" ora scritto correttamente con due 'g'
         risultati.append({
             "Farmacia": nome_farmacia,
             "Totale_Prodotti": totale_prodotti,
             "Info_Spedizione": info_spedizione,
-            "Suggerimento": sugerimento,
+            "Suggerimento": suggerimento,
             "Prezzo_Finale": totale_complessivo
         })
         

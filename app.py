@@ -38,16 +38,16 @@ st.markdown("""
     </style>
 """, unsafe_allow_html=True)
 
-# 3. Interfaccia Intestazione con Colori Personalizzati Forzati
-st.markdown("<div style='text-align: center; font-size: 52px; margin-bottom: 5px;'>🐕 🔍 🛒</div>", unsafe_allow_html=True)
+# 3. Interfaccia Intestazione con Colori Personalizzati (Senza duplicati nativi!)
+st.markdown("<div style='text-align: center; font-size: 52px; margin-top: 20px; margin-bottom: 5px;'>🐕 🔍 🛒</div>", unsafe_allow_html=True)
 
-# Titolo bicolore (Blu Notte e Azzurro) e sottotitolo coordinato
+# Abbiamo rimosso st.title e st.subheader per eliminare le scritte doppie nere
 st.html("""
     <div style="text-align: center; margin-bottom: 25px;">
         <h1 style="color: #1e3a8a; font-family: 'Helvetica Neue', Arial, sans-serif; font-size: 46px; font-weight: 800; margin: 0;">
             Fiuta<span style="color: #0288d1;">Carrello</span>
         </h1>
-        <p style="color: #475569; font-family: 'Helvetica Neue', Arial, sans-serif; font-size: 16px; font-weight: 400; margin-top: 8px; line-height: 1.4;">
+        <p style="color: #475569; font-family: 'Helvetica Neue', Arial, sans-serif; font-size: 16px; font-weight: 400; margin-top: 12px; line-height: 1.5; max-width: 600px; margin-left: auto; margin-right: auto;">
             L'algoritmo intelligente che scova la combinazione più economica e azzera le spese di spedizione
         </p>
     </div>

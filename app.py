@@ -122,13 +122,13 @@ if prodotti_selezionati:
         
         risultati.append({
             "Farmacia": nome_farmacia,
-            "Totale Prodotti": totale_prodotti,
-            "Info Spedizione": info_spedizione,
+            "Totale_Prodotti": totale_prodotti,
+            "Info_Spedizione": info_spedizione,
             "Suggerimento": suggerimento,
-            "Prezzo Finale": totale_complessivo
+            "Prezzo_Finale": totale_complessivo
         })
         
-    df_risultati = pd.DataFrame(risultati).sort_values(by="Prezzo Finale")
+    df_risultati = pd.DataFrame(risultati).sort_values(by="Prezzo_Finale")
     
     st.write("")
     st.markdown("### 🏆 Classifica Convenienza:")
@@ -160,7 +160,6 @@ if prodotti_selezionati:
         
         # BOTTONE DELLA TRASPARENZA: Mostra le singole voci di questa specifica farmacia
         with st.expander(f"📄 Vedi singole voci per {row.Farmacia}"):
-            # Creiamo una tabella pulita solo per i prodotti e il prezzo in questa farmacia
             df_singolo = df_filtrato[["Prodotto", row.Farmacia]].copy()
             df_singolo.columns = ["Prodotto Selezionato", "Prezzo in questa Farmacia"]
             df_singolo["Prezzo in questa Farmacia"] = df_singolo["Prezzo in questa Farmacia"].map('{:.2f} €'.format)

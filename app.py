@@ -1,25 +1,48 @@
 import streamlit as st
 import pandas as pd
 
-# Impostazione della pagina nativa
+# 1. Impostazione della pagina nativa
 st.set_page_config(
     page_title="FiutaCarrello - Il fiuto intelligente per la tua spesa", 
     page_icon="🛒", 
     layout="centered"
 )
 
-# Struttura con stili in linea (inline styles) per evitare che Streamlit li ignori
+# 2. Iniezione CSS globale corretta (Sintassi verificata)
 st.markdown("""
-    <div style="text-align: center; margin-top: 10px;">
-        <span style="font-size: 50px;">🐕 🔍 🛒</span>
-        <h1 style="color: #1a237e !important; font-family: 'Helvetica Neue', Arial, sans-serif; font-size: 45px; font-weight: 800; margin-top: 10px; margin-bottom: 5px;">
-            Fiuta<span style="color: #0288d1;">Carrello</span>
-        </h1>
-        <p style="color: #5c6bc0; font-family: 'Helvetica Neue', Arial, sans-serif; font-size: 16px; margin-top: 0; margin-bottom: 25px;">
-            L'algoritmo intelligente che scova la combinazione più economica e azzera le spese di spedizione
-        </p>
-    </div>
+    <style>
+    /* Forza il font a livello globale */
+    html, body, [data-testid="stMarkdownContainer"] p {
+        font-family: 'Helvetica Neue', Arial, sans-serif !important;
+    }
+    
+    /* CARD RISULTATI RIPULITE ED ELEGANTI */
+    .farmacia-card {
+        background-color: #ffffff !important;
+        border: 1px solid #e0e0e0 !important;
+        padding: 18px 20px !important;
+        border-radius: 12px !important;
+        margin-bottom: 16px !important;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.02) !important;
+    }
+    
+    .vincitore-card {
+        background-color: #f4fbf7 !important;
+        border: 2px solid #00c853 !important;
+        padding: 18px 20px !important;
+        border-radius: 12px !important;
+        margin-bottom: 16px !important;
+        box-shadow: 0 4px 12px rgba(0,200,83,0.08) !important;
+    }
+    </style>
 """, unsafe_allow_html=True)
+
+# 3. Interfaccia pulita usando i componenti nativi di Streamlit
+st.markdown("<div style='text-align: center; font-size: 50px;'>🐕 🔍 🛒</div>", unsafe_allow_html=True)
+
+# Titolo e sottotitolo nativi per massima compatibilità
+st.title("FiutaCarrello")
+st.subheader("L'algoritmo intelligente che scova la combinazione più economica e azzera le spese di spedizione")
 
 st.write("---")
 
@@ -46,7 +69,7 @@ database_prezzi = {
         "💧 Bionike Defence Hydra Crema 50ml",
         "✨ Rilastil Crema Smagliature 200ml",
         "☀️ Eucerin Sun Fluid Viso 50+",
-        "🌼 Heel Arnica Com-Heel Omeopatico 50 tav",
+        "🌼 Heel Arnica Comp-Heel Omeopatico 50 tav",
         "🧠 Boiron Sedatif PC Ansia/Sonno 90 cpr"
     ],
     "Farmacia Igea": [32.90, 19.80, 16.50, 11.20, 28.40, 14.50, 22.90, 18.50, 11.90, 39.90, 16.20, 26.80, 15.90, 12.50, 13.40],
@@ -101,7 +124,7 @@ if prodotti_selezionati:
     st.write("")
     st.markdown("### 📊 Risultati dell'analisi:")
     
-    # Generazione delle card con stili inline rigidi
+    # Generazione delle card con stili inline stabili
     for i, row in enumerate(df_risultati.itertuples()):
         is_vincitore = (i == 0)
         
@@ -110,20 +133,15 @@ if prodotti_selezionati:
         elif i == 2: badge = "🥉"
         else: badge = "📋"
         
-        # Gestione stili differenziati inline per vincitore e altri
         if is_vincitore:
-            bg_color = "#f4fbf7"
-            border_style = "2px solid #00c853"
+            card_class = "vincitore-card"
             prezzo_color = "#00c853"
-            shadow = "0 4px 12px rgba(0,200,83,0.08)"
         else:
-            bg_color = "#ffffff"
-            border_style = "1px solid #e0e0e0"
-            prezzo_color = #1a237e"
-            shadow = "0 2px 4px rgba(0,0,0,0.02)"
+            card_class = "farmacia-card"
+            prezzo_color = "#1a237e"
         
         st.markdown(f"""
-            <div style="background-color: {bg_color}; border: {border_style}; padding: 18px 20px; border-radius: 12px; margin-bottom: 16px; box-shadow: {shadow}; font-family: Arial, sans-serif;">
+            <div class="{card_class}">
                 <div style="font-size: 24px; font-weight: bold; float: right; color: {prezzo_color};">{row.Prezzo_Finale:.2f} €</div>
                 <div style="font-size: 18px; font-weight: bold; color: #1a237e;">{badge} {row.Farmacia}</div>
                 <div style="font-size: 14px; color: #555; margin-top: 6px;">

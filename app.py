@@ -8,41 +8,50 @@ st.set_page_config(
     layout="centered"
 )
 
-# 2. Iniezione CSS globale corretta (Sintassi verificata)
+# 2. Iniezione CSS globale corretta e potenziata
 st.markdown("""
     <style>
-    /* Forza il font a livello globale */
+    /* Forza il font moderno su tutta la pagina */
     html, body, [data-testid="stMarkdownContainer"] p {
         font-family: 'Helvetica Neue', Arial, sans-serif !important;
     }
     
-    /* CARD RISULTATI RIPULITE ED ELEGANTI */
+    /* CARD STANDARD - Elegante con leggera sfumatura */
     .farmacia-card {
         background-color: #ffffff !important;
-        border: 1px solid #e0e0e0 !important;
+        border: 1px solid #e2e8f0 !important;
         padding: 18px 20px !important;
-        border-radius: 12px !important;
+        border-radius: 14px !important;
         margin-bottom: 16px !important;
-        box-shadow: 0 2px 4px rgba(0,0,0,0.02) !important;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03) !important;
     }
     
+    /* CARD VINCITORE - Verde premium evidenziato */
     .vincitore-card {
-        background-color: #f4fbf7 !important;
-        border: 2px solid #00c853 !important;
+        background-color: #f0fdf4 !important;
+        border: 2px solid #22c55e !important;
         padding: 18px 20px !important;
-        border-radius: 12px !important;
+        border-radius: 14px !important;
         margin-bottom: 16px !important;
-        box-shadow: 0 4px 12px rgba(0,200,83,0.08) !important;
+        box-shadow: 0 10px 15px -3px rgba(34, 197, 94, 0.1), 0 4px 6px -4px rgba(34, 197, 94, 0.1) !important;
     }
     </style>
 """, unsafe_allow_html=True)
 
-# 3. Interfaccia pulita usando i componenti nativi di Streamlit
-st.markdown("<div style='text-align: center; font-size: 50px;'>🐕 🔍 🛒</div>", unsafe_allow_html=True)
+# 3. Interfaccia Intestazione con Colori Personalizzati Forzati
+st.markdown("<div style='text-align: center; font-size: 52px; margin-bottom: 5px;'>🐕 🔍 🛒</div>", unsafe_allow_html=True)
 
-# Titolo e sottotitolo nativi per massima compatibilità
-st.title("FiutaCarrello")
-st.subheader("L'algoritmo intelligente che scova la combinazione più economica e azzera le spese di spedizione")
+# Titolo bicolore (Blu Notte e Azzurro) e sottotitolo coordinato
+st.html("""
+    <div style="text-align: center; margin-bottom: 25px;">
+        <h1 style="color: #1e3a8a; font-family: 'Helvetica Neue', Arial, sans-serif; font-size: 46px; font-weight: 800; margin: 0;">
+            Fiuta<span style="color: #0288d1;">Carrello</span>
+        </h1>
+        <p style="color: #475569; font-family: 'Helvetica Neue', Arial, sans-serif; font-size: 16px; font-weight: 400; margin-top: 8px; line-height: 1.4;">
+            L'algoritmo intelligente che scova la combinazione più economica e azzera le spese di spedizione
+        </p>
+    </div>
+""")
 
 st.write("---")
 
@@ -99,13 +108,13 @@ if prodotti_selezionati:
         
         if mancante_per_gratis <= 0:
             costo_spedizione = 0.0
-            info_spedizione = "<span style='color: #00c853; font-weight: bold;'>Spedizione GRATIS 🎉</span>"
+            info_spedizione = "<span style='color: #22c55e; font-weight: bold;'>Spedizione GRATIS 🎉</span>"
             suggerimento = ""
         else:
             costo_spedizione = regole["spedizione_fissa"]
-            info_spedizione = f"<span style='color: #d32f2f; font-weight: bold;'>Spedizione: +{costo_spedizione:.2f} €</span> (soglia gratis a {regole['soglia_gratis']:.0f} €)"
+            info_spedizione = f"<span style='color: #ef4444; font-weight: bold;'>Spedizione: +{costo_spedizione:.2f} €</span> (soglia gratis a {regole['soglia_gratis']:.0f} €)"
             if mancante_per_gratis <= 15.00:
-                suggerimento = f"<div style='background-color: #fffde7; border-left: 4px solid #fdd835; padding: 8px 12px; font-size: 13px; border-radius: 4px; margin-top: 8px; color: #4e342e;'>🎯 <b>Il consiglio di FiutaCarrello:</b> Ti mancano solo <b>{mancante_per_gratis:.2f}€</b> per azzerare la spedizione su questo sito!</div>"
+                suggerimento = f"<div style='background-color: #fef08a; border-left: 4px solid #facc15; padding: 10px 14px; font-size: 13px; border-radius: 6px; margin-top: 10px; color: #713f12;'>🎯 <b>Il consiglio di FiutaCarrello:</b> Ti mancano solo <b>{mancante_per_gratis:.2f}€</b> per azzerare la spedizione su questo sito! Conviene aggiungere un piccolo prodotto.</div>"
             else:
                 suggerimento = ""
                 
@@ -124,7 +133,7 @@ if prodotti_selezionati:
     st.write("")
     st.markdown("### 📊 Risultati dell'analisi:")
     
-    # Generazione delle card con stili inline stabili
+    # Generazione delle card con stili e ombreggiature
     for i, row in enumerate(df_risultati.itertuples()):
         is_vincitore = (i == 0)
         
@@ -135,16 +144,16 @@ if prodotti_selezionati:
         
         if is_vincitore:
             card_class = "vincitore-card"
-            prezzo_color = "#00c853"
+            prezzo_color = "#22c55e"
         else:
             card_class = "farmacia-card"
-            prezzo_color = "#1a237e"
+            prezzo_color = "#1e3a8a"
         
         st.markdown(f"""
             <div class="{card_class}">
-                <div style="font-size: 24px; font-weight: bold; float: right; color: {prezzo_color};">{row.Prezzo_Finale:.2f} €</div>
-                <div style="font-size: 18px; font-weight: bold; color: #1a237e;">{badge} {row.Farmacia}</div>
-                <div style="font-size: 14px; color: #555; margin-top: 6px;">
+                <div style="font-size: 26px; font-weight: 800; float: right; color: {prezzo_color};">{row.Prezzo_Finale:.2f} €</div>
+                <div style="font-size: 18px; font-weight: bold; color: #1e3a8a;">{badge} {row.Farmacia}</div>
+                <div style="font-size: 14px; color: #64748b; margin-top: 6px;">
                     Prodotti: {row.Totale_Prodotti:.2f} € | {row.Info_Spedizione}
                 </div>
                 {row.Suggerimento}

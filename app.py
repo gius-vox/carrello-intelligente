@@ -8,93 +8,47 @@ st.set_page_config(
     layout="centered"
 )
 
-# 2. Iniezione CSS globale corretta e potenziata
+# 2. Iniezione CSS globale per layout e card
 st.markdown("""
     <style>
+    /* Forza il font moderno su tutta la pagina */
     html, body, [data-testid="stMarkdownContainer"] p {
         font-family: 'Helvetica Neue', Arial, sans-serif !important;
     }
+    
+    /* CARD STANDARD */
     .farmacia-card {
         background-color: #ffffff !important;
         border: 1px solid #e2e8f0 !important;
         padding: 18px 20px !important;
         border-radius: 14px !important;
         margin-bottom: 16px !important;
-        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05) !important;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03) !important;
     }
+    
+    /* CARD VINCITORE */
     .vincitore-card {
         background-color: #f0fdf4 !important;
         border: 2px solid #22c55e !important;
         padding: 18px 20px !important;
         border-radius: 14px !important;
         margin-bottom: 16px !important;
-        box-shadow: 0 10px 15px -3px rgba(34, 197, 94, 0.1) !important;
+        box-shadow: 0 10px 15px -3px rgba(34, 197, 94, 0.1), 0 4px 6px -4px rgba(34, 197, 94, 0.1) !important;
     }
-    /* Contenitore per centrare i loghi SVG */
+    
+    /* Contenitore logo centrato */
     .logo-container {
         display: flex;
         justify-content: center;
         align-items: center;
-        margin-bottom: 10px;
+        margin-top: 15px;
+        margin-bottom: 15px;
     }
     </style>
 """, unsafe_allow_html=True)
 
-# ------------------------------------------------------------------
-# PANNELLO DI SCELTA LOGO (Temporaneo, per farti decidere visivamente)
-# ------------------------------------------------------------------
-st.sidebar.header("🎨 Laboratorio Creativo Logo")
-opzione_logo = st.sidebar.radio(
-    "Scegli quale concetto visualizzare in cima:",
-    ("Opzione 1: Il Cane-Carrello (Geometrico)", 
-     "Opzione 2: Il Segugio Detective (Iconico)", 
-     "Opzione 3: La F Dinamica (Tech-Minimal)",
-     "Nessuno, lascia solo il testo pulito")
-)
-st.sidebar.info("💡 Guarda come cambia la cima della pagina e scegli quello che ti trasmette più fiducia e professionalità!")
-
-# Definizione dei 3 loghi in SVG grafico puro
-logo_1_svg = """
-<div class="logo-container">
-<svg width="100" height="100" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
-    <!-- Corpo Carrello/Cane -->
-    <path d="M25 40H75V55H35L30 40" stroke="#1e3a8a" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
-    <path d="M32 45H70" stroke="#1e3a8a" stroke-width="2"/>
-    <path d="M34 50H65" stroke="#1e3a8a" stroke-width="2"/>
-    <!-- Collo e Testa da segugio integrata davanti -->
-    <path d="M75 40L82 28H92L90 38L82 42" fill="#0288d1" stroke="#1e3a8a" stroke-width="3" stroke-linejoin="round"/>
-    <!-- Orecchio penzolante -->
-    <path d="M80 28C78 34 82 38 82 38" stroke="#1e3a8a" stroke-width="3" stroke-linecap="round"/>
-    <!-- Coda dinamica dietro -->
-    <path d="M25 40C20 35 18 25 22 22" stroke="#0288d1" stroke-width="4" stroke-linecap="round"/>
-    <!-- Ruote / Zampe -->
-    <circle cx="38" cy="68" r="7" stroke="#1e3a8a" stroke-width="3" fill="#ffffff"/>
-    <circle cx="38" cy="68" r="2" fill="#1e3a8a"/>
-    <circle cx="68" cy="68" r="7" stroke="#1e3a8a" stroke-width="3" fill="#ffffff"/>
-    <circle cx="68" cy="68" r="2" fill="#1e3a8a"/>
-</svg>
-</div>
-"""
-
-logo_2_svg = """
-<div class="logo-container">
-<svg width="100" height="100" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
-    <!-- Faccia Cane Stilizzata -->
-    <path d="M25 65C25 45 40 35 55 35H75V55C75 62 65 68 55 68H45" stroke="#1e3a8a" stroke-width="4" stroke-linecap="round" fill="#ffffff"/>
-    <!-- Orecchia Lunga Cadente (Tratto distintivo del fiuto) -->
-    <path d="M38 38C28 42 26 58 32 68C35 72 40 68 38 55" fill="#0288d1" stroke="#1e3a8a" stroke-width="3"/>
-    <!-- Occhio Sveglio -->
-    <circle cx="60" cy="46" r="3" fill="#1e3a8a"/>
-    <!-- Cappello da Detective / Lente sopra -->
-    <path d="M48 35L58 22H78L75 35H48" fill="#1e3a8a"/>
-    <path d="M78 32H86" stroke="#1e3a8a" stroke-width="3" stroke-linecap="round"/>
-    <!-- Tartufo/Naso Nero che fiuta -->
-    <circle cx="75" cy="55" r="4.5" fill="#000000"/>
-</svg>
-</div>
-"""
-
-logo_3_svg = """
+# 3. Logo Definitivo (La F Dinamica Tech) inserito stabilmente
+st.markdown("""
 <div class="logo-container">
 <svg width="100" height="100" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
     <!-- Cerchio di sfondo tech morbido -->
@@ -107,21 +61,9 @@ logo_3_svg = """
     <circle cx="66" cy="74" r="3" fill="#0288d1"/>
 </svg>
 </div>
-"""
+""", unsafe_allow_html=True)
 
-# Mostra il logo selezionato dall'utente nel pannello laterale
-if "Opzione 1" in opzione_logo:
-    st.markdown(logo_1_svg, unsafe_allow_html=True)
-elif "Opzione 2" in opzione_logo:
-    st.markdown(logo_2_svg, unsafe_allow_html=True)
-elif "Opzione 3" in opzione_logo:
-    st.markdown(logo_3_svg, unsafe_allow_html=True)
-else:
-    st.markdown("<div style='margin-top:20px;'></div>", unsafe_allow_html=True)
-
-# ------------------------------------------------------------------
-
-# Titolo bicolore e sottotitolo coordinato
+# 4. Intestazione Brand
 st.html("""
     <div style="text-align: center; margin-bottom: 25px;">
         <h1 style="color: #1e3a8a; font-family: 'Helvetica Neue', Arial, sans-serif; font-size: 46px; font-weight: 800; margin: 0;">
@@ -180,6 +122,7 @@ prodotti_selezionati = st.multiselect(
 if prodotti_selezionati:
     df_filtrato = df_prezzi[df_prezzi["Prodotto"].isin(prodotti_selezionati)]
     
+    # Calcoli
     risultati = []
     for nome_farmacia, regole in farmacie_info.items():
         totale_prodotti = float(df_filtrato[nome_farmacia].sum())
@@ -203,7 +146,7 @@ if prodotti_selezionati:
             "Farmacia": nome_farmacia,
             "Totale_Prodotti": totale_prodotti,
             "Info_Spedizione": info_spedizione,
-            "Suggerimento": suggerimento,
+            "Suggerimento": sugerimento,
             "Prezzo_Finale": totale_complessivo
         })
         

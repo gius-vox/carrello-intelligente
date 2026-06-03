@@ -1,15 +1,61 @@
 import streamlit as st
 import pandas as pd
 
-# Impostazione pagina (titolo scheda e icona)
-st.set_page_config(page_title="Carrello Intelligente", page_icon="💊", layout="centered")
+# Configurazione pagina e stile moderno
+st.set_page_config(page_title="Carrello Intelligente", page_icon="🛒", layout="centered")
 
-# Stile estetico per il titolo principale
-st.markdown("<h1 style='text-align: center; color: #0288d1;'>💊 Carrello Intelligente</h1>", unsafe_allow_html=True)
-st.markdown("<p style='text-align: center; font-size: 1.1em; color: #555;'>Trova all'istante la farmacia online più conveniente per il tuo carrello reale.</p>", unsafe_allow_html=True)
+# CSS personalizzato per mantenere il look pulito ma trasparente
+st.markdown("""
+    <style>
+    .reportview-container .main .block-container{ padding-top: 1rem; }
+    .farmacia-card {
+        background-color: #ffffff;
+        border: 1px solid #e0e0e0;
+        padding: 15px 20px;
+        border-radius: 12px;
+        margin-bottom: 16px;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+    }
+    .vincitore-card {
+        background-color: #f1f8e9;
+        border: 2px solid #4caf50;
+        padding: 18px 20px;
+        border-radius: 12px;
+        margin-bottom: 20px;
+        box-shadow: 0 4px 8px rgba(76,175,80,0.1);
+    }
+    .prezzo-tag {
+        font-size: 1.5em;
+        font-weight: bold;
+        float: right;
+        color: #1565c0;
+    }
+    .prezzo-tag-vincitore {
+        font-size: 1.6em;
+        font-weight: bold;
+        float: right;
+        color: #2e7d32;
+    }
+    .sped-gratis { color: #2e7d32; font-weight: bold; font-size: 0.9em; }
+    .sped-pagamento { color: #c62828; font-weight: bold; font-size: 0.9em; }
+    .suggerimento-testo {
+        background-color: #fff8e1;
+        border-left: 4px solid #ffb300;
+        padding: 8px 12px;
+        font-size: 0.85em;
+        border-radius: 4px;
+        margin-top: 8px;
+        margin-bottom: 8px;
+        color: #5d4037;
+    }
+    </style>
+""", unsafe_allow_html=True)
+
+st.markdown("<h1 style='text-align: center; color: #1e88e5; margin-bottom: 5px;'>🛒 Carrello Intelligente</h1>", unsafe_allow_html=True)
+st.markdown("<p style='text-align: center; color: #666; font-size: 1em;'>Confronto trasparente dei prezzi e delle spese di spedizione.</p>", unsafe_allow_html=True)
 st.write("---")
 
-# 1. Regole spedizioni per 4 farmacie reali
+# Data
 farmacie_info = {
     "Farmacia Igea": {"spedizione_fissa": 4.90, "soglia_gratis": 49.00},
     "Farmacia Loreto": {"spedizione_fissa": 3.90, "soglia_gratis": 39.90},
@@ -17,7 +63,6 @@ farmacie_info = {
     "Dr. Max": {"spedizione_fissa": 4.50, "soglia_gratis": 59.90}
 }
 
-# 2. Database REALE mappato su 4 farmacie con icone
 database_prezzi = {
     "Prodotto": [
         "❤️ Armolipid Plus (Colesterolo) 60 cpr", 
@@ -43,90 +88,83 @@ database_prezzi = {
 }
 df_prezzi = pd.DataFrame(database_prezzi)
 
-# 3. Selezione Prodotti da parte dell'utente
-st.subheader("🛒 1. Componi il tuo carrello")
+# Selezione prodotti
+st.markdown("### 🛍️ Inserisci i prodotti:")
 prodotti_selezionati = st.multiselect(
-    "Scegli i prodotti che vuoi acquistare:",
+    "Aggiungi o rimuovi elementi dal tuo carrello:",
     options=df_prezzi["Prodotto"].tolist(),
-    default=["💅 Swisse Capelli Pelle Unghie 60 tav", "🥄 Magnesio Supremo Polvere 300g"]
+    default=["💅 Swisse Capelli Pelle Unghie 60 tav", "🥄 Magnesio Supremo Polvere 300g"],
+    label_visibility="collapsed"
 )
 
 if prodotti_selezionati:
     df_filtrato = df_prezzi[df_prezzi["Prodotto"].isin(prodotti_selezionati)]
     
-    # Menu a comparsa per i dettagli prezzi (così non appesantisce la vista)
-    with st.expander("🔍 Clicca qui per vedere il dettaglio dei singoli prezzi"):
-        st.dataframe(df_filtrato.set_index("Prodotto"), use_container_width=True)
-
-    # Calcoli dinamici del carrello complessivo
+    # Calcoli
     risultati = []
-    suggerimenti = []
-    
     for nome_farmacia, regole in farmacie_info.items():
         totale_prodotti = float(df_filtrato[nome_farmacia].sum())
         mancante_per_gratis = regole["soglia_gratis"] - totale_prodotti
         
         if mancante_per_gratis <= 0:
             costo_spedizione = 0.0
-            testo_spedizione = "0.00 € (Gratis 🎉)"
-            testo_mancante = "Raggiunta! ✅"
+            info_spedizione = "<span class='sped-gratis'>Spedizione GRATIS 🎉</span>"
+            suggerimento = ""
         else:
             costo_spedizione = regole["spedizione_fissa"]
-            testo_spedizione = f"{costo_spedizione:.2f} €"
-            testo_mancante = f"Mancano {mancante_per_gratis:.2f} €"
-            
-            # SUGGERIMENTO SMART: se mancano meno di 15€, avvisa l'utente
+            info_spedizione = f"<span class='sped-pagamento'>Spedizione: +{costo_spedizione:.2f} €</span> (fino a {regole['soglia_gratis']:.0f} €)"
             if mancante_per_gratis <= 15.00:
-                suggerimenti.append(f"💡 **{nome_farmacia}**: ti mancano appena **{mancante_per_gratis:.2f}€** per sbloccare la spedizione gratuita ed evitare di sprecare {costo_spedizione:.2f}€ di consegna!")
-            
+                suggerimento = f"💡 <b>Consiglio:</b> Ti mancano solo <b>{mancante_per_gratis:.2f}€</b> per azzerare la spedizione. Ti conviene aggiungere un prodotto economico!"
+            else:
+                suggerimento = ""
+                
         totale_complessivo = totale_prodotti + costo_spedizione
         
         risultati.append({
             "Farmacia": nome_farmacia,
-            "Prodotti (€)": round(totale_prodotti, 2),
-            "Spedizione": testo_spedizione,
-            "Manca a Sped. Gratis": testo_mancante,
-            "Soglia Sped. Gratis": f"{regole['soglia_gratis']:.2f} €",
-            "TOTALE COMPLESSIVO": round(totale_complessivo, 2)
+            "Totale Prodotti": totale_prodotti,
+            "Info Spedizione": info_spedizione,
+            "Suggerimento": suggerimento,
+            "Prezzo Finale": totale_complessivo
         })
         
-    df_risultati = pd.DataFrame(risultati).sort_values(by="TOTALE COMPLESSIVO")
+    df_risultati = pd.DataFrame(risultati).sort_values(by="Prezzo Finale")
     
-    # 4. IL PODIO DEL VINCITORE (Grafica d'impatto)
-    miglior_farmacia = df_risultati.iloc[0]["Farmacia"]
-    miglior_prezzo = df_risultati.iloc[0]["TOTALE COMPLESSIVO"]
-    costo_sped_migliore = df_risultati.iloc[0]["Spedizione"]
+    st.write("")
+    st.markdown("### 🏆 Classifica Convenienza:")
     
-    st.write("---")
-    st.subheader("🏆 2. Risultato della Comparazione")
-    
-    # Box colorato verde smeraldo per il vincitore
-    st.markdown(f"""
-    <div style='background-color: #e8f5e9; border-left: 6px solid #2e7d32; padding: 20px; border-radius: 8px; margin-bottom: 20px;'>
-        <h3 style='margin: 0; color: #2e7d32;'>🥇 LA SCELTA MIGLIORE: {miglior_farmacia}</h3>
-        <p style='margin: 5px 0 0 0; font-size: 1.4em; font-weight: bold; color: #1b5e20;'>
-            Totale complessivo: {miglior_prezzo:.2f} €
-        </p>
-        <p style='margin: 3px 0 0 0; font-size: 0.9em; color: #555;'>
-            Costo Spedizione: {costo_sped_migliore}
-        </p>
-    </div>
-    """, unsafe_allow_html=True)
-    
-    # Tabella riassuntiva per le altre posizioni
-    st.write("📊 **Classifica completa di tutte le farmacie:**")
-    # Arrotondiamo la colonna finale visiva per estetica
-    df_visivo = df_risultati.copy()
-    df_visivo["TOTALE COMPLESSIVO"] = df_visivo["TOTALE COMPLESSIVO"].map('{:.2f} €'.format)
-    df_visivo["Prodotti (€)"] = df_visivo["Prodotti (€)"].map('{:.2f} €'.format)
-    st.dataframe(df_visivo.set_index("Farmacia"), use_container_width=True)
-    
-    # Mostriamo i consigli se attivi
-    if suggerimenti:
-        st.write("---")
-        st.subheader("🧠 3. Strategie di Risparmio rilevate:")
-        for sug in suggerimenti:
-            st.info(sug)
+    # Generazione delle card con dettaglio voci trasparente integrato
+    for i, row in enumerate(df_risultati.itertuples()):
+        is_vincitore = (i == 0)
+        
+        if i == 0: badge = "👑"
+        elif i == 1: badge = "🥈"
+        elif i == 2: badge = "🥉"
+        else: badge = "⏰"
+        
+        card_class = "vincitore-card" if is_vincitore else "farmacia-card"
+        prezzo_class = "prezzo-tag-vincitore" if is_vincitore else "prezzo-tag"
+        suggerimento_html = f"<div class='suggerimento-testo'>{row.Suggerimento}</div>" if row.Suggerimento else ""
+        
+        # Intestazione grafica della farmacia
+        st.markdown(f"""
+            <div class="{card_class}" style="margin-bottom: 5px;">
+                <div class="{prezzo_class}">{row.Prezzo_Finale:.2f} €</div>
+                <div style="font-size: 1.1em; font-weight: bold; color: #333;">{badge} {row.Farmacia}</div>
+                <div style="font-size: 0.9em; color: #666; margin-top: 4px;">
+                    Prodotti: {row.Totale_Prodotti:.2f} € | {row.Info_Spedizione}
+                </div>
+                {suggerimento_html}
+            </div>
+        """, unsafe_allow_html=True)
+        
+        # BOTTONE DELLA TRASPARENZA: Mostra le singole voci di questa specifica farmacia
+        with st.expander(f"📄 Vedi singole voci per {row.Farmacia}"):
+            # Creiamo una tabella pulita solo per i prodotti e il prezzo in questa farmacia
+            df_singolo = df_filtrato[["Prodotto", row.Farmacia]].copy()
+            df_singolo.columns = ["Prodotto Selezionato", "Prezzo in questa Farmacia"]
+            df_singolo["Prezzo in questa Farmacia"] = df_singolo["Prezzo in questa Farmacia"].map('{:.2f} €'.format)
+            st.dataframe(df_singolo.set_index("Prodotto Selezionato"), use_container_width=True)
+            
 else:
-    st.write("---")
-    st.info("Seleziona i prodotti dal menu sopra per far calcolare l'algoritmo.")
+    st.info("Scegli almeno un prodotto per visualizzare il confronto prezzi.")

@@ -181,7 +181,7 @@ if prodotti_selezionati:
             "Farmacia": nome_farmacia, "Totale_Prodotti": totale_prodotti,
             "Info_Spedizione": info_sped, "Suggerimento": suggerimento, "Prezzo_Finale": totale_complessivo
         })
-    df_risultati_singoli = pd.DataFrame(risultoli_singoli if 'risultati_singoli' not in locals() else risultati_singoli).sort_values(by="Prezzo_Finale")
+    df_risultati_singoli = pd.DataFrame(risultati_singoli if 'risultati_singoli' not in locals() else risultati_singoli).sort_values(by="Prezzo_Finale")
     miglior_singolo = df_risultati_singoli.iloc[0]["Prezzo_Finale"]
     nome_miglior_singolo = df_risultati_singoli.iloc[0]["Farmacia"]
 

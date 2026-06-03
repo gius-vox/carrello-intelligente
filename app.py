@@ -1,43 +1,35 @@
 import streamlit as st
 import pandas as pd
 
-# Configurazione pagina e stile moderno (Brand: FiutaCarrello)
-st.set_page_config(page_title="FiutaCarrello - Il fiuto intelligente per la tua spesa", page_icon="🐕", layout="centered")
+# 1. Impostazione della pagina
+st.set_page_config(
+    page_title="FiutaCarrello - Il fiuto intelligente per la tua spesa", 
+    page_icon="🛒", 
+    layout="centered"
+)
 
-# CSS Corretto e potenziato per forzare i nuovi colori professionali
+# 2. Iniezione CSS globale per sovrascrivere il tema di default di Streamlit
 st.markdown("""
     <style>
-    /* Forza il reset dei font e rimuove padding inutili */
-    .block-container { padding-top: 2rem !important; }
-    
-    /* STILE BRAND FIUTACARRELLO */
-    .brand-container {
-        text-align: center;
-        padding: 10px 0 20px 0;
-        margin-bottom: 10px;
-    }
-    .logo-fiuto {
-        font-size: 45px !important;
-        margin-bottom: 10px;
-    }
-    
-    .brand-title {
+    /* Sovrascrive i font e i colori nativi di Streamlit a livello globale */
+    html, body, [data-testid="stMarkdownContainer"] p {
         font-family: 'Helvetica Neue', Arial, sans-serif !important;
-        color: #1a237e !important; /* Blu Notte istituzionale */
-        font-size: 2.8em !important;
+    }
+    
+    /* Forza il colore Blu Notte sul titolo principale */
+    h1 {
+        color: #1a237e !important;
         font-weight: 800 !important;
         letter-spacing: -1px !important;
-        margin: 0 !important;
-        padding: 0 !important;
+        text-align: center !important;
     }
-    .brand-title span {
-        color: #0288d1 !important; /* Carrello evidenziato in azzurro tech */
-    }
-    .brand-subtitle {
+    
+    /* Colore del sottotitolo */
+    h3 {
         color: #5c6bc0 !important;
-        font-size: 1.1em !important;
-        margin-top: 8px !important;
         font-weight: 400 !important;
+        text-align: center !important;
+        font-size: 1.2em !important;
     }
 
     /* CARD RISULTATI RIPULITE ED ELEGANTI */
@@ -49,28 +41,33 @@ st.markdown("""
         margin-bottom: 16px !important;
         box-shadow: 0 2px 4px rgba(0,0,0,0.02) !important;
     }
+    
     .vincitore-card {
-        background-color: #f4fbf7 !important; /* Verde chiarissimo di successo */
-        border: 2px solid #00c853 !important; /* Verde vittoria definito */
+        background-color: #f4fbf7 !important;
+        border: 2px solid #00c853 !important;
         padding: 18px 20px !important;
         border-radius: 12px !important;
         margin-bottom: 20px !important;
         box-shadow: 0 4px 12px rgba(0,200,83,0.08) !important;
     }
+    
     .prezzo-tag {
         font-size: 1.5em !important;
         font-weight: bold !important;
         float: right !important;
         color: #1a237e !important;
     }
+    
     .prezzo-tag-vincitore {
         font-size: 1.6em !important;
         font-weight: bold !important;
         float: right !important;
         color: #00c853 !important;
     }
+    
     .sped-gratis { color: #00c853 !important; font-weight: bold !important; font-size: 0.9em !important; }
     .sped-pagamento { color: #d32f2f !important; font-weight: bold !important; font-size: 0.9em !important; }
+    
     .suggerimento-testo {
         background-color: #fffde7 !important;
         border-left: 4px solid #fdd835 !important;
@@ -84,14 +81,12 @@ st.markdown("""
     </style>
 """, unsafe_allow_html=True)
 
-# Rendering dell'intestazione FiutaCarrello con tag HTML puliti
-st.markdown("""
-    <div class="brand-container">
-        <div class="logo-fiuto">🐕 🔍 🛒</div>
-        <h1 class="brand-title">Fiuta<span>Carrello</span></h1>
-        <p class="brand-subtitle">L'algoritmo intelligente che scova la combinazione più economica e azzera le spese di spedizione</p>
-    </div>
-""", unsafe_allow_html=True)
+# 3. Intestazione visiva mista (Nativa + HTML) per evitare blocchi
+st.markdown("<div style='text-align: center; font-size: 50px;'>🐕 🔍 🛒</div>", unsafe_allow_html=True)
+
+# Usiamo l'HTML diretto per il titolo combinato bi-colore
+st.markdown("<h1>Fiuta<span style='color: #0288d1;'>Carrello</span></h1>", unsafe_allow_html=True)
+st.markdown("<h3>L'algoritmo intelligente che scova la combinazione più economica e azzera le spese di spedizione</h3>", unsafe_allow_html=True)
 
 st.write("---")
 

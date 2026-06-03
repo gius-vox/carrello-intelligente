@@ -1,6 +1,7 @@
 import streamlit as st
 import pandas as pd
 import itertools
+import os
 
 # 1. Impostazione della pagina nativa
 st.set_page_config(
@@ -15,8 +16,6 @@ st.markdown("""
     html, body, [data-testid="stMarkdownContainer"] p {
         font-family: 'Helvetica Neue', Arial, sans-serif !important;
     }
-    
-    /* CARD STANDARD ORE 1-2-3 */
     .farmacia-card {
         background-color: #ffffff !important;
         border: 1px solid #e2e8f0 !important;
@@ -25,8 +24,6 @@ st.markdown("""
         margin-bottom: 16px !important;
         box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05) !important;
     }
-    
-    /* CARD VINCITORE SINGOLO */
     .vincitore-card {
         background-color: #f0fdf4 !important;
         border: 2px solid #22c55e !important;
@@ -35,8 +32,6 @@ st.markdown("""
         margin-bottom: 16px !important;
         box-shadow: 0 10px 15px -3px rgba(34, 197, 94, 0.1) !important;
     }
-
-    /* CARD SPLIT CONVENIENTE */
     .split-card {
         background-color: #f0f9ff !important;
         border: 2px solid #0288d1 !important;
@@ -45,8 +40,6 @@ st.markdown("""
         margin-bottom: 20px !important;
         box-shadow: 0 10px 15px -3px rgba(2, 136, 209, 0.15) !important;
     }
-
-    /* CARD SPLIT NON CONVENIENTE (INFORMATIVA) */
     .split-card-info {
         background-color: #f8fafc !important;
         border: 2px dashed #cbd5e1 !important;
@@ -54,8 +47,6 @@ st.markdown("""
         border-radius: 14px !important;
         margin-bottom: 20px !important;
     }
-
-    /* Helper allineamento icone nei titoli */
     .title-with-icon {
         display: flex;
         align-items: center;
@@ -94,9 +85,21 @@ st.markdown("""
 
 st.write("---")
 
-# Session state per preservare il carrello
+# 5. Caricamento sicuro del Database CSV esterno
+csv_path = "prodotti.csv"
+if os.path.exists(csv_path):
+    df_prezzi = pd.read_csv(csv_path)
+else:
+    st.error("Errore critico: File 'prodotti.csv' non trovato. Assicurati di averlo caricato su GitHub insieme ad app.py.")
+    st.stop()
+
+# Set state iniziale con prodotti reali presenti nel CSV
 if "carrello_spesa" not in st.session_state:
-    st.session_state.carrello_spesa = ["Armolipid Plus (Colesterolo) 60 cpr", "Supradyn Ricarica 60 cpr effervescenti", "Somatoline Snellente 7 Notti 400ml"]
+    st.session_state.carrello_spesa = [
+        "Sustenium Plus Energizzante 22 bustine", 
+        "La Roche-Posay Anthelios XL 50+", 
+        "Tachipirina 1000mg Orosolubile 12 cpr"
+    ]
 
 # Regole Spedizioni Farmacie
 farmacie_info = {
@@ -106,41 +109,15 @@ farmacie_info = {
     "Dr. Max": {"spedizione_fissa": 4.50, "soglia_gratis": 59.90}
 }
 
-# Database prodotti (Pulito dalle emoji nel testo)
-database_prezzi = {
-    "Prodotto": [
-        "Armolipid Plus (Colesterolo) 60 cpr", "Multicentrum Adulti 90 cpr", "Swisse Capelli Pelle Unghie 60 tav", 
-        "Arnica Gel Forte 30% 100ml", "Oscillococcinum Omeopatico 30 dosi", "Enterogermina Immuno Fermenti 20 cpr",
-        "Supradyn Ricarica 60 cpr effervescenti", "Magnesio Supremo Polvere 300g", "Massigen Magnesio e Potassio 30 buste",
-        "Somatoline Snellente 7 Notti 400ml", "Bionike Defence Hydra Crema 50ml", "Rilastil Crema Smagliature 200ml",
-        "Eucerin Sun Fluid Viso 50+", "Arnica Comp-Heel Omeopatico 50 tav", "Boiron Sedatif PC Ansia/Sonno 90 cpr"
-    ],
-    "Immagine": [
-        "https://cdn-icons-png.flaticon.com/512/3024/3024613.png", "https://cdn-icons-png.flaticon.com/512/4341/4341147.png",
-        "https://cdn-icons-png.flaticon.com/512/822/822143.png", "https://cdn-icons-png.flaticon.com/512/3004/3004613.png",
-        "https://cdn-icons-png.flaticon.com/512/2966/2966426.png", "https://cdn-icons-png.flaticon.com/512/865/865805.png",
-        "https://cdn-icons-png.flaticon.com/512/2864/2864274.png", "https://cdn-icons-png.flaticon.com/512/5061/5061214.png",
-        "https://cdn-icons-png.flaticon.com/512/6122/6122393.png", "https://cdn-icons-png.flaticon.com/512/3063/3063822.png",
-        "https://cdn-icons-png.flaticon.com/512/481/481116.png", "https://cdn-icons-png.flaticon.com/512/3144/3144360.png",
-        "https://cdn-icons-png.flaticon.com/512/2917/2917633.png", "https://cdn-icons-png.flaticon.com/512/4341/4341071.png",
-        "https://cdn-icons-png.flaticon.com/512/1047/1047683.png"
-    ],
-    "Farmacia Igea": [32.90, 19.80, 16.50, 11.20, 28.40, 14.50, 22.90, 18.50, 11.90, 39.90, 16.20, 26.80, 15.90, 12.50, 13.40],
-    "Farmacia Loreto": [31.50, 20.50, 15.90, 12.40, 27.90, 13.90, 21.80, 17.90, 9.90, 38.50, 15.50, 24.90, 14.20, 11.90, 12.80],
-    "Farmacie Raven": [33.50, 19.50, 16.90, 9.50, 28.90, 14.20, 23.10, 18.20, 10.50, 39.00, 15.90, 25.50, 15.10, 12.20, 13.10],
-    "Dr. Max": [29.90, 18.90, 13.20, 11.95, 26.90, 13.50, 20.90, 16.90, 8.90, 36.90, 14.80, 23.90, 13.90, 11.50, 12.20]
-}
-df_prezzi = pd.DataFrame(database_prezzi)
-
-# --- SEZIONE: RICERCA PRODOTTO (Icona Lente SVG) ---
+# --- SEZIONE: RICERCA PRODOTTO ---
 st.markdown("""
     <div class="title-with-icon">
         <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#0288d1" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
-        <span style="font-size: 20px;">Cerca un prodotto da aggiungere:</span>
+        <span style="font-size: 20px;">Cerca un prodotto nel database (300+ disponibili):</span>
     </div>
 """, unsafe_allow_html=True)
 
-cerca_testo = st.text_input("Digita qui cosa stai cercando...", placeholder="Scrivi qui il nome del farmaco...", label_visibility="collapsed")
+cerca_testo = st.text_input("Digita qui cosa stai cercando...", placeholder="Scrivi qui il nome del farmaco (es. Tachipirina, Polase, Aboca, Avene, Durex)...", label_visibility="collapsed")
 
 if cerca_testo:
     df_trovati = df_prezzi[df_prezzi["Prodotto"].str.contains(cerca_testo, case=False)]
@@ -163,10 +140,12 @@ if cerca_testo:
                         st.session_state.carrello_spesa.append(prod)
                         st.rerun()
                 st.markdown("</div>", unsafe_allow_html=True)
+    else:
+        st.warning("Nessun prodotto trovato. Prova con parole chiave come 'Tosse', 'Crema', 'Vitamina', 'Aboca'!")
 
 st.write("---")
 
-# Riepilogo del carrello (Icone Borsa SVG)
+# Riepilogo del carrello
 st.markdown("""
     <div class="title-with-icon">
         <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#1e3a8a" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"></path><line x1="3" y1="6" x2="21" y2="6"></line><path d="M16 10a4 4 0 0 1-8 0"></path></svg>
@@ -196,17 +175,17 @@ if prodotti_selezionati:
         
         info_sped = "<span style='color: #22c55e; font-weight: bold;'>Spedizione GRATIS</span>" if costo_spedizione == 0 else f"<span style='color: #ef4444; font-weight: bold;'>Spedizione: +{costo_spedizione:.2f} €</span>"
         mancante = regole["soglia_gratis"] - totale_prodotti
-        suggerimento = f"<div style='background-color: #fef08a; border-left: 4px solid #facc15; padding: 10px; font-size: 12px; border-radius: 6px; margin-top: 8px; color: #713f12;'>Target: Ti mancano solo <b>{mancante:.2f}€</b> per la spedizione gratis!</div>" if (0 < mancante <= 15.00) else ""
+        suggerimento = f"<div style='background-color: #fef08a; border-left: 4px solid #facc15; padding: 10px; font-size: 12px; border-radius: 6px; margin-top: 8px; color: #713f12;'>🎯 Ti mancano solo <b>{mancante:.2f}€</b> per la spedizione gratis!</div>" if (0 < mancante <= 15.00) else ""
 
         risultati_singoli.append({
             "Farmacia": nome_farmacia, "Totale_Prodotti": totale_prodotti,
             "Info_Spedizione": info_sped, "Suggerimento": suggerimento, "Prezzo_Finale": totale_complessivo
         })
-    df_risultati_singoli = pd.DataFrame(risultati_singoli).sort_values(by="Prezzo_Finale")
+    df_risultati_singoli = pd.DataFrame(risultoli_singoli if 'risultoli_singoli' not in locals() else risultati_singoli).sort_values(by="Prezzo_Finale")
     miglior_singolo = df_risultati_singoli.iloc[0]["Prezzo_Finale"]
     nome_miglior_singolo = df_risultati_singoli.iloc[0]["Farmacia"]
 
-    # ALGORITMO DI SPLIT
+    # ALGORITMO COMBINATORIO
     best_split_cost = miglior_singolo
     best_split_arrangement = None
     prodotti_lista = df_filtrato["Prodotto"].tolist()
@@ -229,7 +208,7 @@ if prodotti_selezionati:
                 best_split_cost = costo_corrente
                 best_split_arrangement = partizione
 
-    # --- VISUALIZZAZIONE SEZIONE INTELLIGENTE (Icona Lampadina SVG) ---
+    # --- VISUALIZZAZIONE SEZIONE INTELLIGENTE ---
     st.write("")
     st.markdown("""
         <div class="title-with-icon">
@@ -243,9 +222,9 @@ if prodotti_selezionati:
         st.markdown(f"""
             <div class="split-card">
                 <div style="font-size: 28px; font-weight: 800; float: right; color: #0288d1;">{best_split_cost:.2f} €</div>
-                <div style="font-size: 20px; font-weight: 900; color: #1e3a8a;">Ottimizzazione: conviene dividere l'ordine</div>
+                <div style="font-size: 20px; font-weight: 900; color: #1e3a8a;">🚀 Ottimizzazione: conviene dividere l'ordine!</div>
                 <div style="font-size: 14px; color: #166534; font-weight: 700; margin-top: 5px; background-color: #dcfce7; display: inline-block; padding: 4px 10px; border-radius: 6px;">
-                    Risparmio extra: {risparmio_netto:.2f} € rispetto a un negozio unico
+                    🔥 Risparmio extra: {risparmio_netto:.2f} € rispetto a un negozio unico
                 </div>
                 <div style="margin-top: 15px; font-size: 14px; color: #334155; margin-bottom: 10px;">
                     <b>Ripartizione consigliata nei carrelli:</b>
@@ -274,7 +253,7 @@ if prodotti_selezionati:
 
     st.write("---")
 
-    # Elenco tradizionale unico negozio (Icona Elenco/Check SVG)
+    # Elenco tradizionale unico negozio
     st.markdown("""
         <div class="title-with-icon">
             <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#1e3a8a" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="8" y1="6" x2="21" y2="6"></line><line x1="8" y1="12" x2="21" y2="12"></line><line x1="8" y1="18" x2="21" y2="18"></line><line x1="3" y1="6" x2="3.01" y2="6"></line><line x1="3" y1="12" x2="3.01" y2="12"></line><line x1="3" y1="18" x2="3.01" y2="18"></line></svg>
@@ -287,7 +266,6 @@ if prodotti_selezionati:
         card_class = "vincitore-card" if is_vincitore else "farmacia-card"
         prezzo_color = "#22c55e" if is_vincitore else "#1e3a8a"
         
-        # Generazione scudetti numerici minimal in formato SVG al posto dei podi amatoriali
         if i == 0:
             badge_svg = '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#22c55e" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" style="margin-right:8px;"><circle cx="12" cy="12" r="10"></circle><path d="M12 16V8M10 10l2-2"></path></svg>'
         elif i == 1:

@@ -51,8 +51,11 @@ st.markdown("""
 st.markdown("""
 <div class="logo-container">
 <svg width="100" height="100" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <!-- Cerchio di sfondo tech morbido -->
     <circle cx="50" cy="50" r="42" fill="#f1f5f9"/>
+    <!-- Lettera F fusa con scia dinamica -->
     <path d="M35 72V28H68M35 48H60" stroke="#1e3a8a" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/>
+    <!-- Simbolo del carrello minimale che taglia la F -->
     <path d="M52 65H68L74 48" stroke="#0288d1" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
     <circle cx="56" cy="74" r="3" fill="#0288d1"/>
     <circle cx="66" cy="74" r="3" fill="#0288d1"/>
@@ -74,7 +77,11 @@ st.html("""
 
 st.write("---")
 
-# Data (Il nostro primo mercato di test)
+# Gestione dello stato del carrello per evitare che si svuoti al click dei bottoni
+if "carrello_spesa" not in st.session_state:
+    st.session_state.carrello_spesa = ["💅 Swisse Capelli Pelle Unghie 60 tav", "🥄 Magnesio Supremo Polvere 300g"]
+
+# Data (Il nostro database)
 farmacie_info = {
     "Farmacia Igea": {"spedizione_fissa": 4.90, "soglia_gratis": 49.00},
     "Farmacia Loreto": {"spedizione_fissa": 3.90, "soglia_gratis": 39.90},
@@ -107,15 +114,46 @@ database_prezzi = {
 }
 df_prezzi = pd.DataFrame(database_prezzi)
 
-# Selezione prodotti
-st.markdown("### 🛍️ Componi il tuo carrello:")
+# --- NUOVA SEZIONE: CERCA E COMPONI IL CARRELLO ---
+st.markdown("### 🔍 Cerca un prodotto da aggiungere:")
+cerca_testo = st.text_input("Digita qui cosa stai cercando (es. Magnesio, Crema, Swisse...)", placeholder="🔎 Scrivi qui il nome del farmaco o integratore...", label_visibility="collapsed")
+
+if cerca_testo:
+    # Filtra il database in base a cosa scrive l'utente (senza fare distinzione tra maiuscole e minuscole)
+    prodotti_trovati = df_prezzi[df_prezzi["Prodotto"].str.contains(cerca_testo, case=False)]["Prodotto"].tolist()
+    
+    if prodotti_trovati:
+        st.write(f"Prodotti trovati ({len(prodotti_trovati)}):")
+        for prod in prodotti_trovati:
+            col1, col2 = st.columns([4, 1])
+            with col1:
+                st.markdown(f"**{prod}**")
+            with col2:
+                # Se il prodotto è già nel carrello mostra un feedback, altrimenti mostra il bottone per aggiungerlo
+                if prod in st.session_state.carrello_spesa:
+                    st.button("✅ Nel Carrello", key=f"btn_in_{prod}", disabled=True)
+                else:
+                    if st.button("🛒 Aggiungi", key=f"btn_add_{prod}"):
+                        st.session_state.carrello_spesa.append(prod)
+                        st.rerun()
+    else:
+        st.warning("Nessun prodotto trovato nel database con questo nome. Prova a scrivere un'altra parola chiave!")
+
+st.write("---")
+
+# Visualizzazione e riepilogo del carrello corrente
+st.markdown("### 🛍️ Il tuo carrello attuale:")
 prodotti_selezionati = st.multiselect(
-    "Aggiungi o rimuovi elementi dal tuo carrello:",
+    "Puoi rimuovere gli elementi cliccando sulla 'x':",
     options=df_prezzi["Prodotto"].tolist(),
-    default=["💅 Swisse Capelli Pelle Unghie 60 tav", "🥄 Magnesio Supremo Polvere 300g"],
-    label_visibility="collapsed"
+    default=st.session_state.carrello_spesa,
+    label_visibility="visible"
 )
 
+# Sincronizza lo stato globale se l'utente rimuove prodotti dalla lista multiselect
+st.session_state.carrello_spesa = prodotti_selezionati
+
+# --- CALCOLO RISULTATI ---
 if prodotti_selezionati:
     df_filtrato = df_prezzi[df_prezzi["Prodotto"].isin(prodotti_selezionati)]
     
@@ -138,7 +176,6 @@ if prodotti_selezionati:
                 
         totale_complessivo = totale_prodotti + costo_spedizione
         
-        # FIX: "Suggerimento" ora scritto correttamente con due 'g'
         risultati.append({
             "Farmacia": nome_farmacia,
             "Totale_Prodotti": totale_prodotti,
@@ -185,4 +222,4 @@ if prodotti_selezionati:
             st.dataframe(df_singolo.set_index("Prodotto Selezionato"), use_container_width=True)
             
 else:
-    st.info("Aggiungi i prodotti in alto per attivare il fiuto del sistema.")
+    st.info("Il tuo carrello è vuoto. Cerca un prodotto in alto e clicca su 'Aggiungi' per attivare l'analisi dei prezzi.")

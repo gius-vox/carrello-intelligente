@@ -4,93 +4,95 @@ import pandas as pd
 # Configurazione pagina e stile moderno (Brand: FiutaCarrello)
 st.set_page_config(page_title="FiutaCarrello - Il fiuto intelligente per la tua spesa", page_icon="🐕", layout="centered")
 
-# CSS personalizzato per il Brand "FiutaCarrello"
+# CSS Corretto e potenziato per forzare i nuovi colori professionali
 st.markdown("""
     <style>
-    .reportview-container .main .block-container{ padding-top: 1rem; }
+    /* Forza il reset dei font e rimuove padding inutili */
+    .block-container { padding-top: 2rem !important; }
     
     /* STILE BRAND FIUTACARRELLO */
     .brand-container {
         text-align: center;
-        padding: 20px 0 10px 0;
+        padding: 10px 0 20px 0;
+        margin-bottom: 10px;
     }
     .logo-fiuto {
-        font-size: 42px;
-        margin-bottom: 5px;
-        display: inline-block;
-        filter: drop-shadow(0px 4px 6px rgba(0,0,0,0.1));
+        font-size: 45px !important;
+        margin-bottom: 10px;
     }
     
     .brand-title {
-        font-family: 'Helvetica Neue', Arial, sans-serif;
-        color: #1a237e; /* Blu Notte istituzionale */
-        font-size: 2.5em;
-        font-weight: 800;
-        letter-spacing: -1px;
-        margin: 0;
+        font-family: 'Helvetica Neue', Arial, sans-serif !important;
+        color: #1a237e !important; /* Blu Notte istituzionale */
+        font-size: 2.8em !important;
+        font-weight: 800 !important;
+        letter-spacing: -1px !important;
+        margin: 0 !important;
+        padding: 0 !important;
     }
     .brand-title span {
-        color: #0288d1; /* Carrello evidenziato in azzurro tech */
+        color: #0288d1 !important; /* Carrello evidenziato in azzurro tech */
     }
     .brand-subtitle {
-        color: #5c6bc0;
-        font-size: 1.05em;
-        margin-top: 5px;
-        margin-bottom: 25px;
+        color: #5c6bc0 !important;
+        font-size: 1.1em !important;
+        margin-top: 8px !important;
+        font-weight: 400 !important;
     }
 
     /* CARD RISULTATI RIPULITE ED ELEGANTI */
     .farmacia-card {
-        background-color: #ffffff;
-        border: 1px solid #e0e0e0;
-        padding: 15px 20px;
-        border-radius: 12px;
-        margin-bottom: 16px;
-        box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+        background-color: #ffffff !important;
+        border: 1px solid #e0e0e0 !important;
+        padding: 15px 20px !important;
+        border-radius: 12px !important;
+        margin-bottom: 16px !important;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.02) !important;
     }
     .vincitore-card {
-        background-color: #f4fbf7; /* Verde chiarissimo di successo */
-        border: 2px solid #00c853; /* Verde vittoria definito */
-        padding: 18px 20px;
-        border-radius: 12px;
-        margin-bottom: 20px;
-        box-shadow: 0 4px 12px rgba(0,200,83,0.08);
+        background-color: #f4fbf7 !important; /* Verde chiarissimo di successo */
+        border: 2px solid #00c853 !important; /* Verde vittoria definito */
+        padding: 18px 20px !important;
+        border-radius: 12px !important;
+        margin-bottom: 20px !important;
+        box-shadow: 0 4px 12px rgba(0,200,83,0.08) !important;
     }
     .prezzo-tag {
-        font-size: 1.5em;
-        font-weight: bold;
-        float: right;
-        color: #1a237e;
+        font-size: 1.5em !important;
+        font-weight: bold !important;
+        float: right !important;
+        color: #1a237e !important;
     }
     .prezzo-tag-vincitore {
-        font-size: 1.6em;
-        font-weight: bold;
-        float: right;
-        color: #00c853;
+        font-size: 1.6em !important;
+        font-weight: bold !important;
+        float: right !important;
+        color: #00c853 !important;
     }
-    .sped-gratis { color: #00c853; font-weight: bold; font-size: 0.9em; }
-    .sped-pagamento { color: #d32f2f; font-weight: bold; font-size: 0.9em; }
+    .sped-gratis { color: #00c853 !important; font-weight: bold !important; font-size: 0.9em !important; }
+    .sped-pagamento { color: #d32f2f !important; font-weight: bold !important; font-size: 0.9em !important; }
     .suggerimento-testo {
-        background-color: #fffde7;
-        border-left: 4px solid #fdd835;
-        padding: 8px 12px;
-        font-size: 0.85em;
-        border-radius: 4px;
-        margin-top: 8px;
-        margin-bottom: 8px;
-        color: #4e342e;
+        background-color: #fffde7 !important;
+        border-left: 4px solid #fdd835 !important;
+        padding: 8px 12px !important;
+        font-size: 0.85em !important;
+        border-radius: 4px !important;
+        margin-top: 8px !important;
+        margin-bottom: 8px !important;
+        color: #4e342e !important;
     }
     </style>
 """, unsafe_allow_html=True)
 
-# Rendering dell'intestazione FiutaCarrello
+# Rendering dell'intestazione FiutaCarrello con tag HTML puliti
 st.markdown("""
     <div class="brand-container">
-        <div class="logo-fiuto">🐕🔍🛒</div>
+        <div class="logo-fiuto">🐕 🔍 🛒</div>
         <h1 class="brand-title">Fiuta<span>Carrello</span></h1>
         <p class="brand-subtitle">L'algoritmo intelligente che scova la combinazione più economica e azzera le spese di spedizione</p>
     </div>
 """, unsafe_allow_html=True)
+
 st.write("---")
 
 # Data (Il nostro primo mercato di test)
@@ -185,7 +187,7 @@ if prodotti_selezionati:
         suggerimento_html = f"<div class='suggerimento-testo'>{row.Suggerimento}</div>" if row.Suggerimento else ""
         
         st.markdown(f"""
-            <div class="{card_class}" style="margin-bottom: 5px;">
+            <div class="{card_class}">
                 <div class="{prezzo_class}">{row.Prezzo_Finale:.2f} €</div>
                 <div style="font-size: 1.1em; font-weight: bold; color: #1a237e;">{badge} {row.Farmacia}</div>
                 <div style="font-size: 0.9em; color: #555; margin-top: 4px;">

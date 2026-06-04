@@ -56,72 +56,68 @@ html, body, [data-testid="stMarkdownContainer"] p {
     color: #1e3a8a;
     font-weight: 700;
     margin-bottom: 15px;
+    font-size: 20px;
 }
 </style>
 """, unsafe_allow_html=True)
 
-# 3. LOGO RIPROGETTATO: CARRELLO AERODINAMICO CHE SFRECCIA
+# 3. LOGO VETTORIALE RIPROGETTATO (Ali raccordate e sfreccianti dal carrello)
 st.components.v1.html("""
 <div style="display: flex; justify-content: center; align-items: center; margin-bottom: 5px;">
-<svg width="180" height="110" viewBox="0 0 180 110" fill="none" xmlns="http://www.w3.org/2000/svg">
-  <ellipse cx="62" cy="86" rx="4" ry="6" fill="#102a6b" transform="rotate(-5 62 86)"/>
-  <ellipse cx="94" cy="86" rx="4" ry="6" fill="#102a6b" transform="rotate(-5 94 86)"/>
+<svg width="200" height="110" viewBox="0 0 200 110" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <ellipse cx="75" cy="88" rx="4.5" ry="7" fill="#1e3a8a" transform="rotate(-8 75 88)"/>
+  <ellipse cx="112" cy="88" rx="4.5" ry="7" fill="#1e3a8a" transform="rotate(-8 112 88)"/>
   
-  <path d="M52 77H100" stroke="#102a6b" stroke-width="4.5" stroke-linecap="round"/>
-  <path d="M53 77L59 40M98 77L105 45" stroke="#102a6b" stroke-width="4.5" stroke-linecap="round"/>
+  <path d="M64 78H120" stroke="#1e3a8a" stroke-width="5" stroke-linecap="round"/>
+  <path d="M66 78L72 38M115 78L122 43" stroke="#1e3a8a" stroke-width="4.5" stroke-linecap="round"/>
   
-  <path d="M104 42H111L113 35" stroke="#102a6b" stroke-width="4.5" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M121 40H130L132 32" stroke="#1e3a8a" stroke-width="4.5" stroke-linecap="round" stroke-linejoin="round"/>
 
-  <path d="M54 39H98C108 39 122 33 134 25C124 35 116 39 126 41C138 43 148 37 154 33C142 45 130 46 122 47C134 50 142 49 146 47C134 56 118 55 102 55L92 69H60L54 39Z" fill="#6ba4f4" stroke="#6ba4f4" stroke-width="1" stroke-linejoin="round"/>
+  <path d="M65 36H116L113 41C123 39 138 34 152 23C140 33 132 38 141 40C155 42 168 36 175 31C160 45 146 46 136 47C150 51 161 50 166 47C150 58 132 56 118 56L108 70H74L65 36Z" fill="#0288d1" stroke="#0288d1" stroke-width="0.5" stroke-linejoin="round"/>
   
-  <path d="M102 43C114 43 124 39 130 35" stroke="#ffffff" stroke-width="2.5" stroke-linecap="round"/>
-  <path d="M105 49C115 49 122 47 127 44" stroke="#ffffff" stroke-width="2" stroke-linecap="round"/>
+  <path d="M115 42C128 42 140 38 148 33" stroke="#ffffff" stroke-width="2.5" stroke-linecap="round"/>
+  <path d="M117 49C129 49 138 46 144 42" stroke="#ffffff" stroke-width="2" stroke-linecap="round"/>
 
-  <path d="M79 47C76.5 45 73 45 71 47.5C68.5 50.5 68.5 55.5 71 58.5C73 61 76.5 61 79 59" stroke="#ffffff" stroke-width="4.5" stroke-linecap="round"/>
+  <path d="M94 45C91.5 43 87.5 43 85.5 45.5C82.5 49 82.5 54.5 85.5 58C87.5 60.5 91.5 60.5 94 58.5" stroke="#ffffff" stroke-width="5" stroke-linecap="round"/>
 </svg>
 </div>
 """, height=115)
 
-# 4. Intestazione Brand
+# 4. Intestazione Brand con Doppio Colore Ripristinato (Blu Notte e Azzurro)
 st.markdown("""
 <div style="text-align: center; margin-bottom: 25px;">
-    <h1 style="color: #102a6b; font-family: 'Outfit', sans-serif; font-size: 36px; font-weight: 800; letter-spacing: 2px; text-transform: uppercase; margin-bottom: 0px;">
-        CARRELLO<span style="color: #6ba4f4;">SNELLO</span>
+    <h1 style="color: #1e3a8a; font-family: 'Outfit', sans-serif; font-size: 40px; font-weight: 800; letter-spacing: 1px; margin-bottom: 0px;">
+        CARRELLO<span style="color: #0288d1;">SNELLO</span>
     </h1>
-    <p style="color: #6ba4f4; font-family: 'Outfit', sans-serif; font-size: 13px; font-weight: 600; letter-spacing: 4px; text-transform: uppercase; margin-top: 3px; margin-bottom: 20px;">
-        Smart Shopping Algorithm
+    <p style="color: #475569; font-family: 'Outfit', sans-serif; font-size: 14px; font-weight: 500; letter-spacing: 3px; text-transform: uppercase; margin-top: 5px; margin-bottom: 20px;">
+        L'algoritmo intelligente per la tua spesa online
     </p>
 </div>
 """, unsafe_allow_html=True)
 
 st.write("---")
 
-# 5. Caricamento Database CSV
+# 5. Caricamento Sicuro del Database CSV
 csv_path = "prodotti.csv"
 if os.path.exists(csv_path):
     df_prezzi = pd.read_csv(csv_path)
 else:
-    st.error("Errore critico: File 'prodotti.csv' non trovato.")
+    st.error("Errore critico: File 'prodotti.csv' non trovato nel repository.")
     st.stop()
 
-# Estrazione pulita dei nomi delle farmacie dalle colonne
+# Pulizia robusta e mappatura delle colonne delle farmacie
 nomi_farmacie = [col for col in df_prezzi.columns if col not in ["Prodotto", "Immagine"]]
 
-# Configurazione robusta delle regole di spedizione (mappa sia i nomi brevi che estesi)
 regole_config = {
-    "Igea": {"spedizione_fissa": 4.90, "soglia_gratis": 49.00},
-    "Loreto": {"spedizione_fissa": 3.90, "soglia_gratis": 39.90},
-    "Raven": {"spedizione_fissa": 5.90, "soglia_gratis": 29.90},
-    "DrMax": {"spedizione_fissa": 4.50, "soglia_gratis": 59.90},
     "Farmacia Igea": {"spedizione_fissa": 4.90, "soglia_gratis": 49.00},
     "Farmacia Loreto": {"spedizione_fissa": 3.90, "soglia_gratis": 39.90},
     "Farmacia Raven": {"spedizione_fissa": 5.90, "soglia_gratis": 29.90},
     "Dr. Max": {"spedizione_fissa": 4.50, "soglia_gratis": 59.90}
 }
 
+# Associazione delle regole di spedizione alle colonne effettive del file
 farmacie_info = {}
 for col in nomi_farmacie:
-    pulita = col.replace("Farmacia ", "").replace("Dr. ", "Dr").strip()
     match_trovato = None
     for k, v in regole_config.items():
         if k.lower() in col.lower() or col.lower() in k.lower():
@@ -134,22 +130,27 @@ for col in nomi_farmacie:
 
 # Inizializzazione dello stato del carrello
 if "carrello_spesa" not in st.session_state:
-    st.session_state.carrello_spesa = []
+    st.session_state.carrello_spesa = [
+        "Sustenium Plus Energizzante 22 bustine",
+        "La Roche-Posay Anthelios XL 50+",
+        "Tachipirina 1000mg Orosolubile 12 cpr"
+    ]
 
 # --- SEZIONE: RICERCA PRODOTTO ---
-st.markdown('<div class="title-with-icon">🔍 Cerca un prodotto nel database:</div>', unsafe_allow_html=True)
+st.markdown("""<div class="title-with-icon">🔍 Cerca un prodotto nel database:</div>""", unsafe_allow_html=True)
 
 lista_prodotti = sorted(df_prezzi["Prodotto"].unique().tolist())
 cerca_testo = st.selectbox(
-    "Seleziona un farmaco da aggiungere:",
+    "Digita o seleziona cosa stai cercando...",
     options=[""] + lista_prodotti,
     index=0,
-    placeholder="Scrivi il nome del farmaco..."
+    placeholder="Scrivi qui il nome del farmaco (es. Tachipirina...)"
 )
 
 if cerca_testo != "":
-    df_trovati = df_prezzi[df_prezzi["Prodotto"] == cerca_testo]
+    df_trovati = df_prezzi[df_prezzi["Prodotto"].str.contains(cerca_testo, case=False)]
     if not df_trovati.empty:
+        st.write(f"Prodotti trovati ({len(df_trovati)}):")
         for index, row in df_trovati.iterrows():
             prod = row["Prodotto"]
             img_url = row["Immagine"]
@@ -180,14 +181,16 @@ if cerca_testo != "":
                             st.session_state.carrello_spesa.append(prod)
                             st.rerun()
                     st.markdown("</div>", unsafe_allow_html=True)
+    else:
+        st.warning("Nessun prodotto trovato. Prova con parole chiave differenti.")
 
 st.write("---")
 
 # --- RIEPILOGO DEL CARRELLO ---
-st.markdown('<div class="title-with-icon">🛒 Il tuo carrello attuale:</div>', unsafe_allow_html=True)
+st.markdown("""<div class="title-with-icon">🛒 Il tuo carrello attuale:</div>""", unsafe_allow_html=True)
 
 prodotti_selezionati = st.multiselect(
-    "Rimuovi gli elementi cliccando sulla 'x':",
+    "Puoi rimuovere gli elementi cliccando sulla 'x':",
     options=df_prezzi["Prodotto"].tolist(),
     default=st.session_state.carrello_spesa
 )
@@ -210,7 +213,7 @@ if prodotti_selezionati:
         
         risultati_singoli.append({
             "Farmacia": nome_farmacia, "Totale_Prodotti": totale_prodotti,
-            "Info_Spedizione": info_sped, "Suggerimento": suggerimento, "Prezzo_Finale": totale_complessivo
+            "Info_Spedizione": info_sped, "Suggerimento": sugerimento, "Prezzo_Finale": totale_complessivo
         })
         
     df_risultati_singoli = pd.DataFrame(risultati_singoli).sort_values(by="Prezzo_Finale").reset_index(drop=True)
@@ -240,7 +243,7 @@ if prodotti_selezionati:
 
     # --- VISUALIZZAZIONE SEZIONE INTELLIGENTE ---
     st.write("")
-    st.markdown('<div class="title-with-icon">✨ Strategia d'Acquisto Intelligente:</div>', unsafe_allow_html=True)
+    st.markdown("""<div class="title-with-icon">✨ Strategia d'Acquisto Intelligente:</div>""", unsafe_allow_html=True)
     
     if best_split_arrangement:
         risparmio_netto = miglior_singolo - best_split_cost
@@ -266,15 +269,15 @@ if prodotti_selezionati:
         <div class="split-card-info">
             <div style="font-size: 15px; font-weight: bold; color: #475569;">🛡️ Controllo combinatorio eseguito</div>
             <p style="font-size: 14px; color: #64748b; margin-top: 6px; margin-bottom: 0;">
-                Dividere l'ordine non conviene: le spese di spedizione multiple annullerebbero il risparmio sui prodotti. Conviene comprare tutto in un unico negozio.
+                L'algoritmo ha verificato ogni combinazione di split. Dividere l'ordine non conviene: le spese di spedizione multiple annullerebbero il risparmio sui prodotti. Conviene comprare tutto in un unico negozio.
             </p>
         </div>
         """, unsafe_allow_html=True)
         
     st.write("---")
     
-    # Elenco farmacie singole
-    st.markdown('<div class="title-with-icon">🏪 Ordinare da un\'unica farmacia:</div>', unsafe_allow_html=True)
+    # Elenco farmacie singole tradizionali
+    st.markdown("""<div class="title-with-icon">🏪 Ordinare da un'unica farmacia:</div>""", unsafe_allow_html=True)
     
     for i, row in enumerate(df_risultati_singoli.itertuples()):
         is_vincitore = (i == 0 and not best_split_arrangement)
@@ -287,7 +290,7 @@ if prodotti_selezionati:
             <div style="font-size: 17px; font-weight: bold; color: #1e3a8a;">
                 🏢 {row.Farmacia}
             </div>
-            <div style="font-size: 13px; color: #64748b; margin-top: 6px;">
+            <div style="font-size: 13px; color: #475569; margin-top: 6px;">
                 Prodotti: {row.Totale_Prodotti:.2f} € | {row.Info_Spedizione}
             </div>
         """, unsafe_allow_html=True)

@@ -55,32 +55,33 @@ html, body, [data-testid="stMarkdownContainer"] p {
     gap: 10px;
     color: #1e3a8a;
     font-weight: 700;
+    margin-top: 20px;
     margin-bottom: 15px;
     font-size: 20px;
 }
 </style>
 """, unsafe_allow_html=True)
 
-# 3. CARICAMENTO LOGO ORIGINALE 
-# Salva il tuo logo originale come 'logo.png' nella stessa cartella dello script
+# 3. CARICAMENTO LOGO ORIGINALE DA FILE STATICÒ
 logo_path = "logo.png"
 if os.path.exists(logo_path):
-    col_logo, _ = st.columns([1, 1])
+    # Centriamo l'immagine usando le colonne di Streamlit
+    col_left, col_logo, col_right = st.columns([1, 2, 1])
     with col_logo:
-        st.image(logo_path, width=220)
+        st.image(logo_path, use_container_width=True)
 else:
-    # Segnaposto testuale pulito se l'immagine non viene trovata
+    # Soluzione di emergenza testuale elegante se il file non è ancora presente
     st.markdown("""
-    <div style="margin-bottom: 20px;">
-        <h1 style="color: #1e3a8a; font-family: 'Outfit', sans-serif; font-size: 36px; font-weight: 800; letter-spacing: 1px; margin-bottom: 0px;">
+    <div style="text-align: center; margin-bottom: 10px;">
+        <h1 style="color: #1e3a8a; font-family: 'Outfit', sans-serif; font-size: 38px; font-weight: 800; letter-spacing: 1px; margin-bottom: 0px;">
             CARRELLO<span style="color: #0288d1;">SNELLO</span>
         </h1>
     </div>
     """, unsafe_allow_html=True)
 
-# 4. Slogan del Brand
+# Slogan del Brand
 st.markdown("""
-<div style="margin-bottom: 25px;">
+<div style="text-align: center; margin-bottom: 25px;">
     <p style="color: #475569; font-family: 'Outfit', sans-serif; font-size: 13px; font-weight: 500; letter-spacing: 3px; text-transform: uppercase; margin-top: 5px; margin-bottom: 20px;">
         L'algoritmo intelligente per la tua spesa online
     </p>
@@ -89,14 +90,15 @@ st.markdown("""
 
 st.write("---")
 
-# 5. Caricamento e controllo del database CSV
+# 4. Caricamento e controllo del database CSV
 csv_path = "prodotti.csv"
 if os.path.exists(csv_path):
     df_prezzi = pd.read_csv(csv_path)
 else:
-    st.error("Errore critico: File 'prodotti.csv' non trovato nell'ambiente di esecuzione.")
+    st.error("Errore critico: File 'prodotti.csv' non trovato. Assicurati che sia nella stessa cartella dello script.")
     st.stop()
 
+# Estrazione pulita dei nomi dei negozi escludendo le colonne di servizio
 nomi_farmacie = [col for col in df_prezzi.columns if col not in ["Prodotto", "Immagine"]]
 
 farmacie_info = {
@@ -173,12 +175,12 @@ prodotti_selezionati = st.multiselect(
 )
 st.session_state.carrello_spesa = prodotti_selezionati
 
-# --- CORE ALGORITMO DI OTTIMIZZAZIONE ---
+# --- CORE ALGORITMO DI CALCOLO ---
 if prodotti_selezionati:
     df_filtrato = df_prezzi[df_prezzi["Prodotto"].isin(prodotti_selezionati)]
     
     risultati_singoli = []
-    # RISOLTO: Iterazione corretta sulle farmacie del database per evitare KeyError
+    # RISOLTO: Iterazione corretta sulle chiavi reali per azzerare il KeyError
     for nome_farmacia in nomi_farmacie:
         regole = farmacie_info[nome_farmacia]
         totale_prodotti = float(df_filtrato[nome_farmacia].sum())
@@ -228,7 +230,7 @@ if prodotti_selezionati:
 
     # --- VISUALIZZAZIONE SEZIONE INTELLIGENTE ---
     st.write("")
-    st.markdown('<div class="title-with-icon">✨ Strategia d'Acquisto Intelligente:</div>', unsafe_allow_html=True)
+    st.markdown('<div class="title-with-icon">✨ Strategia d\'Acquisto Intelligente:</div>', unsafe_allow_html=True)
     
     if best_split_arrangement:
         risparmio_netto = miglior_singolo - best_split_cost
@@ -262,7 +264,7 @@ if prodotti_selezionati:
     st.write("---")
     
     # Elenco farmacie singole
-    st.markdown('<div class="title-with-icon">🏪 Ordinare da un'unica farmacia:</div>', unsafe_allow_html=True)
+    st.markdown('<div class="title-with-icon">🏪 Ordinare da un\'unica farmacia:</div>', unsafe_allow_html=True)
     
     for row in df_risultati_singoli.itertuples():
         is_vincitore = (row.Index == 0 and not best_split_arrangement)

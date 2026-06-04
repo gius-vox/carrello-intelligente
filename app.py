@@ -61,30 +61,30 @@ html, body, [data-testid="stMarkdownContainer"] p {
 </style>
 """, unsafe_allow_html=True)
 
-# 3. LOGO SVG COMPLETAMENTE RIPROGETTATO (Fluido, integrato e proporzionato)
+# 3. LOGO REALE COMPATTO E VETTORIALE (Ricostruito fedelmente sul modello originale)
 st.components.v1.html("""
 <div style="display: flex; justify-content: center; align-items: center; margin-bottom: 5px;">
-<svg width="240" height="120" viewBox="0 0 240 120" fill="none" xmlns="http://www.w3.org/2000/svg">
-  <ellipse cx="102" cy="96" rx="5.5" ry="8.5" fill="#1E3A8A" transform="rotate(-12 102 96)"/>
-  <ellipse cx="146" cy="96" rx="5.5" ry="8.5" fill="#1E3A8A" transform="rotate(-12 146 96)"/>
+<svg width="200" height="110" viewBox="0 0 200 110" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <ellipse cx="88" cy="92" rx="5" ry="7" fill="#1E3A8A"/>
+  <ellipse cx="124" cy="92" rx="5" ry="7" fill="#1E3A8A"/>
   
-  <path d="M88 85H156" stroke="#1E3A8A" stroke-width="5.5" stroke-linecap="round"/>
-  <path d="M93 85L100 45M138 85L145 52" stroke="#1E3A8A" stroke-width="4.5" stroke-linecap="round"/>
+  <path d="M78 82H130" stroke="#1E3A8A" stroke-width="5" stroke-linecap="round"/>
+  <path d="M84 82L88 56M118 82L122 56" stroke="#1E3A8A" stroke-width="4" stroke-linecap="round"/>
   
-  <path d="M144 46H154L157 36" stroke="#1E3A8A" stroke-width="4.5" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M125 52L129 34H138" stroke="#1E3A8A" stroke-width="4.5" stroke-linecap="round" stroke-linejoin="round"/>
 
-  <path d="M88 41H143L133 73H98L88 41Z" fill="#0288d1"/>
+  <path d="M72 32H126L118 64H80L72 32Z" fill="#60a5fa" stroke="#0288d1" stroke-width="2" stroke-linejoin="round"/>
   
-  <path d="M89 44C70 41 45 47 25 55C48 48 70 46 89 47" stroke="#0288d1" stroke-width="7.5" stroke-linecap="round" stroke-linejoin="round"/>
-  <path d="M91 54C73 52 52 58 34 66C54 59 74 57 92 58" stroke="#0288d1" stroke-width="6.5" stroke-linecap="round" stroke-linejoin="round"/>
-  <path d="M93 64C79 63 60 69 45 76C61 70 77 68 94 69" stroke="#0288d1" stroke-width="5.5" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M123 38C134 36 148 31 156 25C150 33 138 39 124 41" fill="#0288d1" stroke="#0288d1" stroke-width="1.5" stroke-linejoin="round"/>
+  <path d="M121 46C135 45 151 42 160 36C152 43 137 47 122 48" fill="#0288d1" stroke="#0288d1" stroke-width="1.5" stroke-linejoin="round"/>
+  <path d="M119 54C131 54 146 53 154 48C146 53 131 56 120 55" fill="#0288d1" stroke="#0288d1" stroke-width="1.5" stroke-linejoin="round"/>
 
-  <path d="M121 51C118.5 49 114.5 49 112 51.5C109.5 54.5 109.5 59.5 112 62.5C114.5 65 118.5 65 121 63" stroke="#ffffff" stroke-width="5.5" stroke-linecap="round"/>
+  <text x="94" y="52" fill="#FFFFFF" font-family="'Outfit', sans-serif" font-size="20" font-weight="800" text-anchor="middle">C</text>
 </svg>
 </div>
-""", height=125)
+""", height=115)
 
-# 4. Intestazione Brand con Doppio Colore (Blu Notte + Azzurro Dinamico)
+# 4. Intestazione Brand con Slogan
 st.markdown("""
 <div style="text-align: center; margin-bottom: 25px;">
     <h1 style="color: #1e3a8a; font-family: 'Outfit', sans-serif; font-size: 38px; font-weight: 800; letter-spacing: 1px; margin-bottom: 0px;">
@@ -98,12 +98,12 @@ st.markdown("""
 
 st.write("---")
 
-# 5. Caricamento database CSV
+# 5. Caricamento e controllo del database CSV
 csv_path = "prodotti.csv"
 if os.path.exists(csv_path):
     df_prezzi = pd.read_csv(csv_path)
 else:
-    st.error("Errore critico: File 'prodotti.csv' non trovato.")
+    st.error("Errore critico: File 'prodotti.csv' non trovato nell'ambiente di esecuzione.")
     st.stop()
 
 nomi_farmacie = [col for col in df_prezzi.columns if col not in ["Prodotto", "Immagine"]]
@@ -182,24 +182,32 @@ prodotti_selezionati = st.multiselect(
 )
 st.session_state.carrello_spesa = prodotti_selezionati
 
-# --- CORE ALGORITMO DI SPLIT ---
+# --- CORE ALGORITMO DI OPTIMIZATION ---
 if prodotti_selezionati:
     df_filtrato = df_prezzi[df_prezzi["Prodotto"].isin(prodotti_selezionati)]
     
     risultati_singoli = []
+    # CORRETTO: Iterazione esplicita sulle chiavi per evitare KeyError
     for nome_farmacia in nomi_farmacie:
         regole = farmacie_info[nome_farmacia]
         totale_prodotti = float(df_filtrato[nome_farmacia].sum())
         costo_spedizione = 0.0 if totale_prodotti >= regole["soglia_gratis"] else regole["spedizione_fissa"]
         totale_complessivo = totale_prodotti + costo_spedizione
         
-        info_sped = "<span style='color: #22c55e; font-weight: bold;'>Spedizione GRATIS</span>" if costo_spedizione == 0.0 else f"Spedizione: {costo_spedizione:.2f}€"
-        mancante = regole["soglia_gratis"] - totale_prodotti
-        suggerimento = f"<div style='background-color: #fef08a; border-left: 4px solid #facc15; padding: 10px; font-size:13px; border-radius:4px; margin-top:8px;'>💡 Aggiungi <b>{mancante:.2f}€</b> per azzerare la spedizione!</div>" if costo_spedizione > 0.0 else ""
+        if costo_spedizione == 0.0:
+            info_sped = "<span style='color: #22c55e; font-weight: bold;'>Spedizione GRATIS</span>"
+            suggerimento = ""
+        else:
+            info_sped = f"Spedizione: {costo_spedizione:.2f}€"
+            mancante = regole["soglia_gratis"] - totale_prodotti
+            suggerimento = f"<div style='background-color: #fef08a; border-left: 4px solid #facc15; padding: 10px; font-size:13px; border-radius:4px; margin-top:8px;'>💡 Aggiungi <b>{mancante:.2f}€</b> su {nome_farmacia} per azzerare la spedizione!</div>"
         
         risultati_singoli.append({
-            "Farmacia": nome_farmacia, "Totale_Prodotti": totale_prodotti,
-            "Info_Spedizione": info_sped, "Suggerimento": suggerimento, "Prezzo_Finale": totale_complessivo
+            "Farmacia": nome_farmacia, 
+            "Totale_Prodotti": totale_prodotti,
+            "Info_Spedizione": info_sped, 
+            "Suggerimento": suggerimento, 
+            "Prezzo_Finale": totale_complessivo
         })
         
     df_risultati_singoli = pd.DataFrame(risultati_singoli).sort_values(by="Prezzo_Finale").reset_index(drop=True)
@@ -265,8 +273,9 @@ if prodotti_selezionati:
     # Elenco farmacie singole
     st.markdown("""<div class="title-with-icon">🏪 Ordinare da un'unica farmacia:</div>""", unsafe_allow_html=True)
     
-    for i, row in enumerate(df_risultati_singoli.itertuples()):
-        is_vincitore = (i == 0 and not best_split_arrangement)
+    for row in df_risultati_singoli.itertuples():
+        # Un negozio singolo è ottimale solo se non esiste una combinazione split migliore
+        is_vincitore = (row.Index == 0 and not best_split_arrangement)
         card_class = "vincitore-card" if is_vincitore else "farmacia-card"
         prezzo_color = "#22c55e" if is_vincitore else "#1e3a8a"
         
@@ -281,5 +290,6 @@ if prodotti_selezionati:
             </div>
         </div>
         """, unsafe_allow_html=True)
+        
         if row.Suggerimento:
             st.markdown(row.Suggerimento, unsafe_allow_html=True)

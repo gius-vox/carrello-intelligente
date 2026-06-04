@@ -13,7 +13,7 @@ st.set_page_config(
 # 2. Iniezione CSS globale per layout, card e font
 st.markdown("""
 <style>
-@import url('https://fonts.googleapis.com/css2?family=Outfit:wght=400;600;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;800&display=swap');
 
 html, body, [data-testid="stMarkdownContainer"] p {
     font-family: 'Outfit', 'Helvetica Neue', Arial, sans-serif !important;
@@ -61,30 +61,30 @@ html, body, [data-testid="stMarkdownContainer"] p {
 </style>
 """, unsafe_allow_html=True)
 
-# 3. NUOVO LOGO GEOMETRICO PULITO (Inclinato, simmetrico e aerodinamico)
+# 3. LOGO SVG COMPLETAMENTE RIPROGETTATO (Fluido, integrato e proporzionato)
 st.components.v1.html("""
 <div style="display: flex; justify-content: center; align-items: center; margin-bottom: 5px;">
-<svg width="220" height="120" viewBox="0 0 220 120" fill="none" xmlns="http://www.w3.org/2000/svg">
-  <path d="M72 45C55 42 35 48 20 54C38 48 55 46 70 47" stroke="#0288d1" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/>
-  <path d="M74 55C58 53 40 59 26 65C42 59 58 57 72 58" stroke="#0288d1" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/>
-  <path d="M76 66C64 64 48 70 36 75C48 70 62 68 74 69" stroke="#0288d1" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
-
-  <ellipse cx="90" cy="98" rx="6" ry="9" fill="#1E3A8A" transform="rotate(-10 90 98)"/>
-  <ellipse cx="135" cy="98" rx="6" ry="9" fill="#1E3A8A" transform="rotate(-10 135 98)"/>
+<svg width="240" height="120" viewBox="0 0 240 120" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <ellipse cx="102" cy="96" rx="5.5" ry="8.5" fill="#1E3A8A" transform="rotate(-12 102 96)"/>
+  <ellipse cx="146" cy="96" rx="5.5" ry="8.5" fill="#1E3A8A" transform="rotate(-12 146 96)"/>
   
-  <path d="M76 86H145" stroke="#1E3A8A" stroke-width="5.5" stroke-linecap="round"/>
-  <path d="M82 86L86 48M128 86L134 52" stroke="#1E3A8A" stroke-width="4.5" stroke-linecap="round"/>
+  <path d="M88 85H156" stroke="#1E3A8A" stroke-width="5.5" stroke-linecap="round"/>
+  <path d="M93 85L100 45M138 85L145 52" stroke="#1E3A8A" stroke-width="4.5" stroke-linecap="round"/>
   
-  <path d="M133 46H144L147 36" stroke="#1E3A8A" stroke-width="4.5" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M144 46H154L157 36" stroke="#1E3A8A" stroke-width="4.5" stroke-linecap="round" stroke-linejoin="round"/>
 
-  <rect x="15" y="42" width="62" height="36" rx="8" fill="#0288d1" transform="translate(68, 0) skewX(-12)"/>
+  <path d="M88 41H143L133 73H98L88 41Z" fill="#0288d1"/>
+  
+  <path d="M89 44C70 41 45 47 25 55C48 48 70 46 89 47" stroke="#0288d1" stroke-width="7.5" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M91 54C73 52 52 58 34 66C54 59 74 57 92 58" stroke="#0288d1" stroke-width="6.5" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M93 64C79 63 60 69 45 76C61 70 77 68 94 69" stroke="#0288d1" stroke-width="5.5" stroke-linecap="round" stroke-linejoin="round"/>
 
-  <path d="M117 53C114.5 51 111 51 109 53.5C106.5 56.5 106.5 61.5 109 64C111 66.5 114.5 66.5 117 64.5" stroke="#ffffff" stroke-width="5.5" stroke-linecap="round"/>
+  <path d="M121 51C118.5 49 114.5 49 112 51.5C109.5 54.5 109.5 59.5 112 62.5C114.5 65 118.5 65 121 63" stroke="#ffffff" stroke-width="5.5" stroke-linecap="round"/>
 </svg>
 </div>
 """, height=125)
 
-# 4. Intestazione Brand con Doppio Colore Perfetto
+# 4. Intestazione Brand con Doppio Colore (Blu Notte + Azzurro Dinamico)
 st.markdown("""
 <div style="text-align: center; margin-bottom: 25px;">
     <h1 style="color: #1e3a8a; font-family: 'Outfit', sans-serif; font-size: 38px; font-weight: 800; letter-spacing: 1px; margin-bottom: 0px;">

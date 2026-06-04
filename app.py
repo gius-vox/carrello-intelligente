@@ -5,7 +5,7 @@ import os
 
 # 1. Impostazione della pagina nativa
 st.set_page_config(
-    page_title="FiutaCarrello - Il fiuto intelligente per la tua spesa",
+    page_title="CarrelloSnello - Il tuo carrello ottimizzato al grammo",
     page_icon="🛒",
     layout="centered"
 )
@@ -58,27 +58,27 @@ html, body, [data-testid="stMarkdownContainer"] p {
 </style>
 """, unsafe_allow_html=True)
 
-# 3. Logo Brand (La F Dinamica Tech)
+# 3. Logo Brand (La C Dinamica Tech e Snella)
 st.components.v1.html("""
 <div style="display: flex; justify-content: center; align-items: center; margin-bottom: 10px;">
 <svg width="90" height="90" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
 <circle cx="50" cy="50" r="42" fill="#f1f5f9"/>
-<path d="M35 72V28H68M35 48H60" stroke="#1e3a8a" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/>
-<path d="M52 65H68L74 48" stroke="#0288d1" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M65 35C60 28 45 28 38 35C30 42 30 58 38 65C45 72 60 72 65 65" stroke="#1e3a8a" stroke-width="7" stroke-linecap="round"/>
+<path d="M48 65H68L74 48" stroke="#0288d1" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
 <circle cx="56" cy="74" r="3" fill="#0288d1"/>
 <circle cx="66" cy="74" r="3" fill="#0288d1"/>
 </svg>
 </div>
 """, height=100)
 
-# 4. Intestazione Brand
+# 4. Intestazione Brand (Nuovo Nome!)
 st.markdown("""
 <div style="text-align: center; margin-bottom: 25px;">
     <h1 style="color: #1e3a8a; font-family: 'Helvetica Neue', Arial, sans-serif; font-size: 44px; font-weight: 800;">
-        Fiuta<span style="color: #0288d1;">Carrello</span>
+        Carrello<span style="color: #0288d1;">Snello</span>
     </h1>
     <p style="color: #475569; font-family: 'Helvetica Neue', Arial, sans-serif; font-size: 16px; font-weight: 400;">
-        L'algoritmo intelligente che scova la combinazione più economica e azzera le spese di spedizione
+        L'algoritmo intelligente che alleggerisce la spesa, azzera le spedizioni e ottimizza i tuoi ordini
     </p>
 </div>
 """, unsafe_allow_html=True)
@@ -96,7 +96,7 @@ else:
 # Rilevamento automatico delle colonne delle farmacie presenti nel tuo CSV
 nomi_farmacie = [col for col in df_prezzi.columns if col not in ["Prodotto", "Immagine"]]
 
-# Dizionario di fallback per le spedizioni basato sul nome delle colonne
+# Dizionario per le regole di spedizione
 regole_spedizione_base = {
     "Igea": {"spedizione_fissa": 4.90, "soglia_gratis": 49.00},
     "Loreto": {"spedizione_fissa": 3.90, "soglia_gratis": 39.90},
@@ -108,16 +108,14 @@ regole_spedizione_base = {
     "Dr. Max": {"spedizione_fissa": 4.50, "soglia_gratis": 59.90}
 }
 
-# Associa dinamicamente le regole alle colonne trovate nel tuo file CSV
 farmacie_info = {}
 for col in nomi_farmacie:
     if col in regole_spedizione_base:
         farmacie_info[col] = regole_spedizione_base[col]
     else:
-        # Valori di default se la colonna ha un nome imprevisto
         farmacie_info[col] = {"spedizione_fissa": 4.50, "soglia_gratis": 49.00}
 
-# Set state iniziale con prodotti reali presenti nel CSV
+# Set state iniziale del carrello
 if "carrello_spesa" not in st.session_state:
     st.session_state.carrello_spesa = [
         "Sustenium Plus Energizzante 22 bustine",
@@ -132,7 +130,6 @@ st.markdown("""
 </div>
 """, unsafe_allow_html=True)
 
-# Lista unica dei farmaci dal CSV
 lista_prodotti = sorted(df_prezzi["Prodotto"].unique().tolist())
 
 cerca_testo = st.selectbox(
@@ -142,7 +139,6 @@ cerca_testo = st.selectbox(
     placeholder="Scrivi qui il nome del farmaco (es. Tachipirina...)"
 )
 
-# Mostra risultati se l'utente ha selezionato qualcosa
 if cerca_testo != "":
     df_trovati = df_prezzi[df_prezzi["Prodotto"] == cerca_testo]
     
@@ -153,7 +149,6 @@ if cerca_testo != "":
             prod = row["Prodotto"]
             img_url = row["Immagine"]
             
-            # Calcolo dinamico del prezzo migliore tra le farmacie reali del CSV
             prezzi_prodotto = row[nomi_farmacie].to_dict()
             farmacia_migliore = min(prezzi_prodotto, key=prezzi_prodotto.get)
             prezzo_migliore = prezzi_prodotto[farmacia_migliore]
@@ -194,7 +189,6 @@ st.markdown("""
 </div>
 """, unsafe_allow_html=True)
 
-# Assicuriamoci che i prodotti di default esistano davvero nel CSV per evitare altri KeyError visivi
 prodotti_validi_default = [p for p in st.session_state.carrello_spesa if p in df_prezzi["Prodotto"].values]
 
 prodotti_selezionati = st.multiselect(
@@ -209,7 +203,6 @@ st.session_state.carrello_spesa = prodotti_selezionati
 if prodotti_selezionati:
     df_filtrato = df_prezzi[df_prezzi["Prodotto"].isin(prodotti_selezionati)]
     
-    # Calcolo opzioni singole tradizionali
     risultati_singoli = []
     for nome_farmacia in nomi_farmacie:
         regole = farmacie_info[nome_farmacia]
@@ -230,9 +223,7 @@ if prodotti_selezionati:
     df_risultati_singoli = df_risultati_singoli.sort_values(by="Prezzo_Finale").reset_index(drop=True)
     
     miglior_singolo = df_risultati_singoli.iloc[0]["Prezzo_Finale"]
-    nome_miglior_singolo = df_risultati_singoli.iloc[0]["Farmacia"]
     
-    # ALGORITMO COMBINATORIO
     best_split_cost = miglior_singolo
     best_split_arrangement = None
     prodotti_lista = df_filtrato["Prodotto"].tolist()

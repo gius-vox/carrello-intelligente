@@ -61,29 +61,30 @@ html, body, [data-testid="stMarkdownContainer"] p {
 </style>
 """, unsafe_allow_html=True)
 
-# 3. LOGO VETTORIALE RACCORDATO (image_5b208f.png)
+# 3. NUOVO LOGO GEOMETRICO PULITO (Inclinato, simmetrico e aerodinamico)
 st.components.v1.html("""
 <div style="display: flex; justify-content: center; align-items: center; margin-bottom: 5px;">
-<svg width="200" height="130" viewBox="0 0 200 130" fill="none" xmlns="http://www.w3.org/2000/svg">
-  <ellipse cx="88" cy="102" rx="5.5" ry="9" fill="#1E3A8A" transform="rotate(-15 88 102)"/>
-  <ellipse cx="128" cy="102" rx="5.5" ry="9" fill="#1E3A8A" transform="rotate(-15 128 102)"/>
-  
-  <path d="M74 91H138" stroke="#1E3A8A" stroke-width="5" stroke-linecap="round"/>
-  <path d="M80 91L85 53M123 91L131 59" stroke="#1E3A8A" stroke-width="4.5" stroke-linecap="round"/>
-  
-  <path d="M130 54H139L142 43" stroke="#1E3A8A" stroke-width="4.5" stroke-linecap="round" stroke-linejoin="round"/>
+<svg width="220" height="120" viewBox="0 0 220 120" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <path d="M72 45C55 42 35 48 20 54C38 48 55 46 70 47" stroke="#0288d1" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M74 55C58 53 40 59 26 65C42 59 58 57 72 58" stroke="#0288d1" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M76 66C64 64 48 70 36 75C48 70 62 68 74 69" stroke="#0288d1" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
 
-  <path d="M73 44H131L126 50.5C136 48.5 149 43.5 163 33C152 42 145 46.5 153.5 48C167 50 179 45 185 40C171 53 158 54 148.5 55C161.5 59 172 58 176.5 55.5C161.5 66 145 64 132 64L121 78H83L73 44Z" fill="#0288d1"/>
+  <ellipse cx="90" cy="98" rx="6" ry="9" fill="#1E3A8A" transform="rotate(-10 90 98)"/>
+  <ellipse cx="135" cy="98" rx="6" ry="9" fill="#1E3A8A" transform="rotate(-10 135 98)"/>
   
-  <path d="M128 52.5C140 52.5 151.5 49 159 44" stroke="#ffffff" stroke-width="2.5" stroke-linecap="round"/>
-  <path d="M130 58.5C141 58.5 149.5 56 155 52.5" stroke="#ffffff" stroke-width="2" stroke-linecap="round"/>
+  <path d="M76 86H145" stroke="#1E3A8A" stroke-width="5.5" stroke-linecap="round"/>
+  <path d="M82 86L86 48M128 86L134 52" stroke="#1E3A8A" stroke-width="4.5" stroke-linecap="round"/>
+  
+  <path d="M133 46H144L147 36" stroke="#1E3A8A" stroke-width="4.5" stroke-linecap="round" stroke-linejoin="round"/>
 
-  <path d="M106 52.5C103.5 50.5 99.5 50.5 97.5 53C94.5 56.5 94.5 62 97.5 65.5C99.5 68 103.5 68 106 66" stroke="#ffffff" stroke-width="5" stroke-linecap="round"/>
+  <rect x="15" y="42" width="62" height="36" rx="8" fill="#0288d1" transform="translate(68, 0) skewX(-12)"/>
+
+  <path d="M117 53C114.5 51 111 51 109 53.5C106.5 56.5 106.5 61.5 109 64C111 66.5 114.5 66.5 117 64.5" stroke="#ffffff" stroke-width="5.5" stroke-linecap="round"/>
 </svg>
 </div>
-""", height=135)
+""", height=125)
 
-# 4. Intestazione Brand con Doppio Colore Ripristinato (Blu Notte e Azzurro)
+# 4. Intestazione Brand con Doppio Colore Perfetto
 st.markdown("""
 <div style="text-align: center; margin-bottom: 25px;">
     <h1 style="color: #1e3a8a; font-family: 'Outfit', sans-serif; font-size: 38px; font-weight: 800; letter-spacing: 1px; margin-bottom: 0px;">
@@ -171,4 +172,114 @@ if cerca_testo != "":
 
 st.write("---")
 
-# ---
+# --- RIEPILOGO DEL CARRELLO ---
+st.markdown("""<div class="title-with-icon">🛒 Il tuo carrello attuale:</div>""", unsafe_allow_html=True)
+
+prodotti_selezionati = st.multiselect(
+    "Puoi rimuovere gli elementi cliccando sulla 'x':",
+    options=df_prezzi["Prodotto"].tolist(),
+    default=st.session_state.carrello_spesa
+)
+st.session_state.carrello_spesa = prodotti_selezionati
+
+# --- CORE ALGORITMO DI SPLIT ---
+if prodotti_selezionati:
+    df_filtrato = df_prezzi[df_prezzi["Prodotto"].isin(prodotti_selezionati)]
+    
+    risultati_singoli = []
+    for nome_farmacia in nomi_farmacie:
+        regole = farmacie_info[nome_farmacia]
+        totale_prodotti = float(df_filtrato[nome_farmacia].sum())
+        costo_spedizione = 0.0 if totale_prodotti >= regole["soglia_gratis"] else regole["spedizione_fissa"]
+        totale_complessivo = totale_prodotti + costo_spedizione
+        
+        info_sped = "<span style='color: #22c55e; font-weight: bold;'>Spedizione GRATIS</span>" if costo_spedizione == 0.0 else f"Spedizione: {costo_spedizione:.2f}€"
+        mancante = regole["soglia_gratis"] - totale_prodotti
+        suggerimento = f"<div style='background-color: #fef08a; border-left: 4px solid #facc15; padding: 10px; font-size:13px; border-radius:4px; margin-top:8px;'>💡 Aggiungi <b>{mancante:.2f}€</b> per azzerare la spedizione!</div>" if costo_spedizione > 0.0 else ""
+        
+        risultati_singoli.append({
+            "Farmacia": nome_farmacia, "Totale_Prodotti": totale_prodotti,
+            "Info_Spedizione": info_sped, "Suggerimento": suggerimento, "Prezzo_Finale": totale_complessivo
+        })
+        
+    df_risultati_singoli = pd.DataFrame(risultati_singoli).sort_values(by="Prezzo_Finale").reset_index(drop=True)
+    miglior_singolo = df_risultati_singoli.iloc[0]["Prezzo_Finale"]
+    
+    best_split_cost = miglior_singolo
+    best_split_arrangement = None
+    prodotti_lista = df_filtrato["Prodotto"].tolist()
+    
+    if len(prodotti_lista) <= 5:
+        for assegnazione in itertools.product(nomi_farmacie, repeat=len(prodotti_lista)):
+            partizione = {f: [] for f in nomi_farmacie}
+            for prod, farmacia in zip(prodotti_lista, assegnazione):
+                partizione[farmacia].append(prod)
+                
+            costo_corrente = 0.0
+            for f, prods_assegnati in partizione.items():
+                if prods_assegnati:
+                    sub_df = df_filtrato[df_filtrato["Prodotto"].isin(prods_assegnati)]
+                    tot_prod = float(sub_df[f].sum())
+                    costo_sped = 0.0 if tot_prod >= farmacie_info[f]["soglia_gratis"] else farmacie_info[f]["spedizione_fissa"]
+                    costo_corrente += (tot_prod + costo_sped)
+                    
+            if costo_corrente < best_split_cost - 0.10:
+                best_split_cost = costo_corrente
+                best_split_arrangement = partizione
+
+    # --- VISUALIZZAZIONE SEZIONE INTELLIGENTE ---
+    st.write("")
+    st.markdown("""<div class="title-with-icon">✨ Strategia d'Acquisto Intelligente:</div>""", unsafe_allow_html=True)
+    
+    if best_split_arrangement:
+        risparmio_netto = miglior_singolo - best_split_cost
+        st.markdown(f"""
+        <div class="split-card">
+            <div style="font-size: 28px; font-weight: 800; float: right; color: #0288d1;">{best_split_cost:.2f} €</div>
+            <div style="font-size: 19px; font-weight: 900; color: #1e3a8a;">🚀 Ottimizzazione: conviene dividere l'ordine!</div>
+            <div style="font-size: 13px; color: #166534; font-weight: 700; margin-top: 5px; background-color: #d1fae5; padding: 4px 8px; border-radius: 4px; display: inline-block;">
+                🔥 Risparmio extra: {risparmio_netto:.2f} € rispetto a un negozio unico
+            </div>
+            <div style="margin-top: 15px; font-size: 14px; color: #334155; margin-bottom: 10px;"><b>Ripartizione consigliata nei carrelli:</b></div>
+        </div>
+        """, unsafe_allow_html=True)
+        
+        for farmacia, prods in best_split_arrangement.items():
+            if prods:
+                st.markdown(f"📦 Su **{farmacia}** prendi:")
+                for p in prods:
+                    prezzo_p = df_filtrato[df_filtrato["Prodotto"] == p][farmacia].values[0]
+                    st.markdown(f"- {p} ({prezzo_p:.2f} €)")
+    else:
+        st.markdown("""
+        <div class="split-card-info">
+            <div style="font-size: 15px; font-weight: bold; color: #475569;">🛡️ Controllo combinatorio eseguito</div>
+            <p style="font-size: 14px; color: #64748b; margin-top: 6px; margin-bottom: 0;">
+                L'algoritmo ha verificato ogni combinazione di split. Dividere l'ordine non conviene: le spese di spedizione multiple annullerebbero il risparmio sui prodotti. Conviene comprare tutto in un unico negozio.
+            </p>
+        </div>
+        """, unsafe_allow_html=True)
+        
+    st.write("---")
+    
+    # Elenco farmacie singole
+    st.markdown("""<div class="title-with-icon">🏪 Ordinare da un'unica farmacia:</div>""", unsafe_allow_html=True)
+    
+    for i, row in enumerate(df_risultati_singoli.itertuples()):
+        is_vincitore = (i == 0 and not best_split_arrangement)
+        card_class = "vincitore-card" if is_vincitore else "farmacia-card"
+        prezzo_color = "#22c55e" if is_vincitore else "#1e3a8a"
+        
+        st.markdown(f"""
+        <div class="{card_class}">
+            <div style="font-size: 24px; font-weight: 800; float: right; color: {prezzo_color};">{row.Prezzo_Finale:.2f} €</div>
+            <div style="font-size: 17px; font-weight: bold; color: #1e3a8a;">
+                🏢 {row.Farmacia}
+            </div>
+            <div style="font-size: 13px; color: #475569; margin-top: 6px;">
+                Prodotti: {row.Totale_Prodotti:.2f} € | {row.Info_Spedizione}
+            </div>
+        </div>
+        """, unsafe_allow_html=True)
+        if row.Suggerimento:
+            st.markdown(row.Suggerimento, unsafe_allow_html=True)

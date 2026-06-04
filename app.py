@@ -13,7 +13,7 @@ st.set_page_config(
 # 2. Iniezione CSS globale per layout, card e font
 st.markdown("""
 <style>
-@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght=400;600;800&display=swap');
 
 html, body, [data-testid="stMarkdownContainer"] p {
     font-family: 'Outfit', 'Helvetica Neue', Arial, sans-serif !important;
@@ -62,15 +62,15 @@ html, body, [data-testid="stMarkdownContainer"] p {
 </style>
 """, unsafe_allow_html=True)
 
-# 3. CARICAMENTO LOGO ORIGINALE DA FILE STATICÒ
+# 3. CARICAMENTO LOGO ORIGINALE DA FILE STATICO
+# Rinomina il tuo file immagine originale (image_5b8681.png) in "logo.png" e mettilo nella stessa cartella
 logo_path = "logo.png"
 if os.path.exists(logo_path):
-    # Centriamo l'immagine usando le colonne di Streamlit
     col_left, col_logo, col_right = st.columns([1, 2, 1])
     with col_logo:
         st.image(logo_path, use_container_width=True)
 else:
-    # Soluzione di emergenza testuale elegante se il file non è ancora presente
+    # Segnaposto testuale pulito se non trova il file immagine
     st.markdown("""
     <div style="text-align: center; margin-bottom: 10px;">
         <h1 style="color: #1e3a8a; font-family: 'Outfit', sans-serif; font-size: 38px; font-weight: 800; letter-spacing: 1px; margin-bottom: 0px;">
@@ -98,9 +98,10 @@ else:
     st.error("Errore critico: File 'prodotti.csv' non trovato. Assicurati che sia nella stessa cartella dello script.")
     st.stop()
 
-# Estrazione pulita dei nomi dei negozi escludendo le colonne di servizio
+# Estrazione dinamica delle colonne dei negozi (esclude Prodotto e Immagine)
 nomi_farmacie = [col for col in df_prezzi.columns if col not in ["Prodotto", "Immagine"]]
 
+# Configurazione fissa delle regole di spedizione
 farmacie_info = {
     "Farmacia Igea": {"spedizione_fissa": 4.90, "soglia_gratis": 49.00},
     "Farmacia Loreto": {"spedizione_fissa": 3.90, "soglia_gratis": 39.90},
@@ -116,7 +117,7 @@ if "carrello_spesa" not in st.session_state:
     ]
 
 # --- SEZIONE: RICERCA PRODOTTO ---
-st.markdown('<div class="title-with-icon">🔍 Cerca un prodotto nel database:</div>', unsafe_allow_html=True)
+st.markdown("""<div class="title-with-icon">🔍 Cerca un prodotto nel database:</div>""", unsafe_allow_html=True)
 
 lista_prodotti = sorted(df_prezzi["Prodotto"].unique().tolist())
 cerca_testo = st.selectbox(
@@ -166,7 +167,7 @@ if cerca_testo != "":
 st.write("---")
 
 # --- RIEPILOGO DEL CARRELLO ---
-st.markdown('<div class="title-with-icon">🛒 Il tuo carrello attuale:</div>', unsafe_allow_html=True)
+st.markdown("""<div class="title-with-icon">🛒 Il tuo carrello attuale:</div>""", unsafe_allow_html=True)
 
 prodotti_selezionati = st.multiselect(
     "Puoi rimuovere gli elementi cliccando sulla 'x':",
@@ -180,8 +181,10 @@ if prodotti_selezionati:
     df_filtrato = df_prezzi[df_prezzi["Prodotto"].isin(prodotti_selezionati)]
     
     risultati_singoli = []
-    # RISOLTO: Iterazione corretta sulle chiavi reali per azzerare il KeyError
-    for nome_farmacia in nomi_farmacie:
+    # RISOLTO ACCURATAMENTE: Filtriamo solo le farmacie reali censite in farmacie_info per evitare KeyError
+    farmacie_valide = [f for f in nomi_farmacie if f in farmacie_info]
+    
+    for nome_farmacia in farmacie_valide:
         regole = farmacie_info[nome_farmacia]
         totale_prodotti = float(df_filtrato[nome_farmacia].sum())
         costo_spedizione = 0.0 if totale_prodotti >= regole["soglia_gratis"] else regole["spedizione_fissa"]
@@ -193,7 +196,7 @@ if prodotti_selezionati:
         else:
             info_sped = f"Spedizione: {costo_spedizione:.2f}€"
             mancante = regole["soglia_gratis"] - totale_prodotti
-            suggerimento = f"<div style='background-color: #fef08a; border-left: 4px solid #facc15; padding: 10px; font-size:13px; border-radius:4px; margin-top:8px;'>💡 Aggiungi <b>{mancante:.2f}€</b> su {nome_farmacia} per azzerare la spedizione!</div>"
+            suggerimento = f"""<div style='background-color: #fef08a; border-left: 4px solid #facc15; padding: 10px; font-size:13px; border-radius:4px; margin-top:8px;'>💡 Aggiungi <b>{mancante:.2f}€</b> su {nome_farmacia} per azzerare la spedizione!</div>"""
         
         risultati_singoli.append({
             "Farmacia": nome_farmacia, 
@@ -210,9 +213,10 @@ if prodotti_selezionati:
     best_split_arrangement = None
     prodotti_lista = df_filtrato["Prodotto"].tolist()
     
+    # Ottimizzazione combinatoria (fino a un massimo di 5 prodotti per motivi di performance)
     if len(prodotti_lista) <= 5:
-        for assegnazione in itertools.product(nomi_farmacie, repeat=len(prodotti_lista)):
-            partizione = {f: [] for f in nomi_farmacie}
+        for assegnazione in itertools.product(farmacie_valide, repeat=len(prodotti_lista)):
+            partizione = {f: [] for f in farmacie_valide}
             for prod, farmacia in zip(prodotti_lista, assegnazione):
                 partizione[farmacia].append(prod)
                 
@@ -230,7 +234,7 @@ if prodotti_selezionati:
 
     # --- VISUALIZZAZIONE SEZIONE INTELLIGENTE ---
     st.write("")
-    st.markdown('<div class="title-with-icon">✨ Strategia d\'Acquisto Intelligente:</div>', unsafe_allow_html=True)
+    st.markdown("""<div class="title-with-icon">✨ Strategia d'Acquisto Intelligente:</div>""", unsafe_allow_html=True)
     
     if best_split_arrangement:
         risparmio_netto = miglior_singolo - best_split_cost
@@ -264,7 +268,7 @@ if prodotti_selezionati:
     st.write("---")
     
     # Elenco farmacie singole
-    st.markdown('<div class="title-with-icon">🏪 Ordinare da un\'unica farmacia:</div>', unsafe_allow_html=True)
+    st.markdown("""<div class="title-with-icon">🏪 Ordinare da un'unica farmacia:</div>""", unsafe_allow_html=True)
     
     for row in df_risultati_singoli.itertuples():
         is_vincitore = (row.Index == 0 and not best_split_arrangement)

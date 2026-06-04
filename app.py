@@ -10,11 +10,13 @@ st.set_page_config(
     layout="centered"
 )
 
-# 2. Iniezione CSS globale per layout e card
+# 2. Iniezione CSS globale per layout, card e font personalizzato
 st.markdown("""
 <style>
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;800&display=swap');
+
 html, body, [data-testid="stMarkdownContainer"] p {
-    font-family: 'Helvetica Neue', Arial, sans-serif !important;
+    font-family: 'Outfit', 'Helvetica Neue', Arial, sans-serif !important;
 }
 .farmacia-card {
     background-color: #ffffff !important;
@@ -58,30 +60,38 @@ html, body, [data-testid="stMarkdownContainer"] p {
 </style>
 """, unsafe_allow_html=True)
 
-# 3. LOGO BRAND CORRETTO E CENTRATO (La C che contiene il Carrello)
+# 3. RIPRODUZIONE LOGO "CARRELLO ALATO" (Basato sul tuo modello)
 st.components.v1.html("""
-<div style="display: flex; justify-content: center; align-items: center; margin-bottom: 10px;">
-<svg width="100" height="100" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
-  <circle cx="50" cy="50" r="44" fill="#f1f5f9"/>
+<div style="display: flex; justify-content: center; align-items: center; margin-bottom: 5px;">
+<svg width="160" height="110" viewBox="0 0 160 110" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <path d="M43 40L48 68H81L86 35H92" stroke="#102a6b" stroke-width="4.5" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M44 74H84" stroke="#102a6b" stroke-width="4.5" stroke-linecap="round"/>
   
-  <path d="M66 36C61 29 47 29 40 36C32 43 32 57 40 64C47 71 61 71 66 64" stroke="#1e3a8a" stroke-width="7.5" stroke-linecap="round"/>
+  <path d="M43 40H86L81 68H48L43 40Z" fill="#6ba4f4"/>
   
-  <path d="M46 54H64L68 42H50" stroke="#0288d1" stroke-width="4.5" stroke-linejoin="round" stroke-linecap="round"/>
+  <path d="M68 49.5C66.5 47 63.5 47 61.5 49.5C59 52 59 56 61.5 58.5C63.5 61 66.5 61 68 58.5" stroke="#ffffff" stroke-width="4" stroke-linecap="round"/>
   
-  <circle cx="51" cy="61" r="3.5" fill="#0288d1"/>
-  <circle cx="61" cy="61" r="3.5" fill="#0288d1"/>
+  <ellipse cx="51" cy="83" rx="3.5" ry="5" fill="#102a6b"/>
+  <ellipse cx="78" cy="83" rx="3.5" ry="5" fill="#102a6b"/>
+  
+  <path d="M85 45C100 45 112 37 112 37C112 37 104 51 90 53" fill="#6ba4f4"/>
+  <path d="M84 53C103 53 115 46 115 46C115 46 105 59 89 60" fill="#6ba4f4"/>
+  <path d="M82 61C97 62 107 56 107 56C107 56 99 67 82 67" fill="#6ba4f4"/>
 </svg>
 </div>
-""", height=110)
+""", height=115)
 
-# 4. Intestazione Brand
+# 4. Intestazione Brand (Stile del Mockup)
 st.markdown("""
 <div style="text-align: center; margin-bottom: 25px;">
-    <h1 style="color: #1e3a8a; font-family: 'Helvetica Neue', Arial, sans-serif; font-size: 44px; font-weight: 800;">
-        Carrello<span style="color: #0288d1;">Snello</span>
+    <h1 style="color: #6ba4f4; font-family: 'Outfit', sans-serif; font-size: 38px; font-weight: 600; letter-spacing: 4px; text-transform: uppercase; margin-bottom: 0px;">
+        CARRELLO<span style="color: #6ba4f4;">SNELLO</span>
     </h1>
-    <p style="color: #475569; font-family: 'Helvetica Neue', Arial, sans-serif; font-size: 16px; font-weight: 400;">
-        L'algoritmo intelligente che alleggerisce la spesa, azzera le spedizioni e ottimizza i tuoi ordini
+    <p style="color: #102a6b; font-family: 'Outfit', sans-serif; font-size: 12px; font-weight: 800; letter-spacing: 3px; text-transform: uppercase; margin-top: 5px; margin-bottom: 20px;">
+        Smart Shopping Algorithm
+    </p>
+    <p style="color: #475569; font-family: 'Outfit', sans-serif; font-size: 15px; font-weight: 400; max-width: 600px; margin: 0 auto;">
+        L'algoritmo intelligente che alleggerisce la spesa, azzera le spedizioni e ottimizza i tuoi ordini farmaceutici.
     </p>
 </div>
 """, unsafe_allow_html=True)
@@ -126,7 +136,7 @@ if "carrello_spesa" not in st.session_state:
         "Tachipirina 1000mg Orosolubile 12 cpr"
     ]
 
-# --- SEZIONE: RICERCA PRODOTTO (Stile Trovaprezzi) ---
+# --- SEZIONE: RICERCA PRODOTTO ---
 st.markdown("""
 <div class="title-with-icon">
     <span style="font-size: 20px;">🔍 Cerca un prodotto nel database (300+ disponibili):</span>

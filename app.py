@@ -61,35 +61,26 @@ html, body, [data-testid="stMarkdownContainer"] p {
 </style>
 """, unsafe_allow_html=True)
 
-# 3. LOGO REALE COMPATTO E VETTORIALE (Ricostruito fedelmente sul modello originale)
-st.components.v1.html("""
-<div style="display: flex; justify-content: center; align-items: center; margin-bottom: 5px;">
-<svg width="200" height="110" viewBox="0 0 200 110" fill="none" xmlns="http://www.w3.org/2000/svg">
-  <ellipse cx="88" cy="92" rx="5" ry="7" fill="#1E3A8A"/>
-  <ellipse cx="124" cy="92" rx="5" ry="7" fill="#1E3A8A"/>
-  
-  <path d="M78 82H130" stroke="#1E3A8A" stroke-width="5" stroke-linecap="round"/>
-  <path d="M84 82L88 56M118 82L122 56" stroke="#1E3A8A" stroke-width="4" stroke-linecap="round"/>
-  
-  <path d="M125 52L129 34H138" stroke="#1E3A8A" stroke-width="4.5" stroke-linecap="round" stroke-linejoin="round"/>
+# 3. CARICAMENTO LOGO ORIGINALE 
+# Salva il tuo logo originale come 'logo.png' nella stessa cartella dello script
+logo_path = "logo.png"
+if os.path.exists(logo_path):
+    col_logo, _ = st.columns([1, 1])
+    with col_logo:
+        st.image(logo_path, width=220)
+else:
+    # Segnaposto testuale pulito se l'immagine non viene trovata
+    st.markdown("""
+    <div style="margin-bottom: 20px;">
+        <h1 style="color: #1e3a8a; font-family: 'Outfit', sans-serif; font-size: 36px; font-weight: 800; letter-spacing: 1px; margin-bottom: 0px;">
+            CARRELLO<span style="color: #0288d1;">SNELLO</span>
+        </h1>
+    </div>
+    """, unsafe_allow_html=True)
 
-  <path d="M72 32H126L118 64H80L72 32Z" fill="#60a5fa" stroke="#0288d1" stroke-width="2" stroke-linejoin="round"/>
-  
-  <path d="M123 38C134 36 148 31 156 25C150 33 138 39 124 41" fill="#0288d1" stroke="#0288d1" stroke-width="1.5" stroke-linejoin="round"/>
-  <path d="M121 46C135 45 151 42 160 36C152 43 137 47 122 48" fill="#0288d1" stroke="#0288d1" stroke-width="1.5" stroke-linejoin="round"/>
-  <path d="M119 54C131 54 146 53 154 48C146 53 131 56 120 55" fill="#0288d1" stroke="#0288d1" stroke-width="1.5" stroke-linejoin="round"/>
-
-  <text x="94" y="52" fill="#FFFFFF" font-family="'Outfit', sans-serif" font-size="20" font-weight="800" text-anchor="middle">C</text>
-</svg>
-</div>
-""", height=115)
-
-# 4. Intestazione Brand con Slogan
+# 4. Slogan del Brand
 st.markdown("""
-<div style="text-align: center; margin-bottom: 25px;">
-    <h1 style="color: #1e3a8a; font-family: 'Outfit', sans-serif; font-size: 38px; font-weight: 800; letter-spacing: 1px; margin-bottom: 0px;">
-        CARRELLO<span style="color: #0288d1;">SNELLO</span>
-    </h1>
+<div style="margin-bottom: 25px;">
     <p style="color: #475569; font-family: 'Outfit', sans-serif; font-size: 13px; font-weight: 500; letter-spacing: 3px; text-transform: uppercase; margin-top: 5px; margin-bottom: 20px;">
         L'algoritmo intelligente per la tua spesa online
     </p>
@@ -123,7 +114,7 @@ if "carrello_spesa" not in st.session_state:
     ]
 
 # --- SEZIONE: RICERCA PRODOTTO ---
-st.markdown("""<div class="title-with-icon">🔍 Cerca un prodotto nel database:</div>""", unsafe_allow_html=True)
+st.markdown('<div class="title-with-icon">🔍 Cerca un prodotto nel database:</div>', unsafe_allow_html=True)
 
 lista_prodotti = sorted(df_prezzi["Prodotto"].unique().tolist())
 cerca_testo = st.selectbox(
@@ -173,7 +164,7 @@ if cerca_testo != "":
 st.write("---")
 
 # --- RIEPILOGO DEL CARRELLO ---
-st.markdown("""<div class="title-with-icon">🛒 Il tuo carrello attuale:</div>""", unsafe_allow_html=True)
+st.markdown('<div class="title-with-icon">🛒 Il tuo carrello attuale:</div>', unsafe_allow_html=True)
 
 prodotti_selezionati = st.multiselect(
     "Puoi rimuovere gli elementi cliccando sulla 'x':",
@@ -182,12 +173,12 @@ prodotti_selezionati = st.multiselect(
 )
 st.session_state.carrello_spesa = prodotti_selezionati
 
-# --- CORE ALGORITMO DI OPTIMIZATION ---
+# --- CORE ALGORITMO DI OTTIMIZZAZIONE ---
 if prodotti_selezionati:
     df_filtrato = df_prezzi[df_prezzi["Prodotto"].isin(prodotti_selezionati)]
     
     risultati_singoli = []
-    # CORRETTO: Iterazione esplicita sulle chiavi per evitare KeyError
+    # RISOLTO: Iterazione corretta sulle farmacie del database per evitare KeyError
     for nome_farmacia in nomi_farmacie:
         regole = farmacie_info[nome_farmacia]
         totale_prodotti = float(df_filtrato[nome_farmacia].sum())
@@ -237,7 +228,7 @@ if prodotti_selezionati:
 
     # --- VISUALIZZAZIONE SEZIONE INTELLIGENTE ---
     st.write("")
-    st.markdown("""<div class="title-with-icon">✨ Strategia d'Acquisto Intelligente:</div>""", unsafe_allow_html=True)
+    st.markdown('<div class="title-with-icon">✨ Strategia d'Acquisto Intelligente:</div>', unsafe_allow_html=True)
     
     if best_split_arrangement:
         risparmio_netto = miglior_singolo - best_split_cost
@@ -271,10 +262,9 @@ if prodotti_selezionati:
     st.write("---")
     
     # Elenco farmacie singole
-    st.markdown("""<div class="title-with-icon">🏪 Ordinare da un'unica farmacia:</div>""", unsafe_allow_html=True)
+    st.markdown('<div class="title-with-icon">🏪 Ordinare da un'unica farmacia:</div>', unsafe_allow_html=True)
     
     for row in df_risultati_singoli.itertuples():
-        # Un negozio singolo è ottimale solo se non esiste una combinazione split migliore
         is_vincitore = (row.Index == 0 and not best_split_arrangement)
         card_class = "vincitore-card" if is_vincitore else "farmacia-card"
         prezzo_color = "#22c55e" if is_vincitore else "#1e3a8a"

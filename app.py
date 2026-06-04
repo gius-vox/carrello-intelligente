@@ -10,7 +10,7 @@ st.set_page_config(
     layout="centered"
 )
 
-# 2. Iniezione CSS globale per layout, card e font
+# 2. Iniezione CSS globale coordinata con i NUOVI colori del logo (Rosso Granata Sfumato e Azzurro Ciano)
 st.markdown("""
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Outfit:wght=400;600;800&display=swap');
@@ -18,6 +18,7 @@ st.markdown("""
 html, body, [data-testid="stMarkdownContainer"] p {
     font-family: 'Outfit', 'Helvetica Neue', Arial, sans-serif !important;
 }
+/* Card standard */
 .farmacia-card {
     background-color: #ffffff !important;
     border: 1px solid #e2e8f0 !important;
@@ -26,21 +27,24 @@ html, body, [data-testid="stMarkdownContainer"] p {
     margin-bottom: 16px !important;
     box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05) !important;
 }
+/* Card del negozio singolo più conveniente */
 .vincitore-card {
-    background-color: #f0fdf4 !important;
-    border: 2px solid #22c55e !important;
+    background-color: #fff5f5 !important;
+    border: 2px solid #a21caf !important; /* Richiamo sfumatura scura del logo */
+    border-left: 6px solid #b91c1c !important; /* Rosso vivo */
     padding: 18px 20px !important;
     border-radius: 14px !important;
     margin-bottom: 16px !important;
-    box-shadow: 0 10px 15px -3px rgba(34, 197, 94, 0.1) !important;
+    box-shadow: 0 10px 15px -3px rgba(185, 28, 28, 0.08) !important;
 }
+/* Card della strategia split (ordine diviso) */
 .split-card {
     background-color: #f0f9ff !important;
-    border: 2px solid #0288d1 !important;
+    border: 2px solid #00a8cc !important; /* Azzurro Ciano del logo */
     padding: 20px !important;
     border-radius: 14px !important;
     margin-bottom: 20px !important;
-    box-shadow: 0 10px 15px -3px rgba(2, 136, 209, 0.1) !important;
+    box-shadow: 0 10px 15px -3px rgba(0, 168, 204, 0.1) !important;
 }
 .split-card-info {
     background-color: #f8fafc !important;
@@ -53,7 +57,7 @@ html, body, [data-testid="stMarkdownContainer"] p {
     display: flex;
     align-items: center;
     gap: 10px;
-    color: #1e3a8a;
+    color: #b91c1c; /* Rosso principale per i titoli importanti */
     font-weight: 700;
     margin-top: 20px;
     margin-bottom: 15px;
@@ -62,22 +66,23 @@ html, body, [data-testid="stMarkdownContainer"] p {
 </style>
 """, unsafe_allow_html=True)
 
-# 3. CARICAMENTO LOGO ORIGINALE DA FILE STATICO
-# Rinomina il tuo file immagine originale (image_5b8681.png) in "logo.png" e mettilo nella stessa cartella
-logo_path = "logo.png"
-if os.path.exists(logo_path):
-    col_left, col_logo, col_right = st.columns([1, 2, 1])
-    with col_logo:
-        st.image(logo_path, use_container_width=True)
-else:
-    # Segnaposto testuale pulito se non trova il file immagine
-    st.markdown("""
-    <div style="text-align: center; margin-bottom: 10px;">
-        <h1 style="color: #1e3a8a; font-family: 'Outfit', sans-serif; font-size: 38px; font-weight: 800; letter-spacing: 1px; margin-bottom: 0px;">
-            CARRELLO<span style="color: #0288d1;">SNELLO</span>
-        </h1>
-    </div>
-    """, unsafe_allow_html=True)
+# 3. CARICAMENTO LOGO NUOVO (SISTEMATO E INCORPORATO AUTOMATICAMENTE VIA URL)
+# Utilizza l'immagine caricata per mostrare il brand senza richiedere file locali
+url_logo = "https://raw.githubusercontent.com/alessandro-b9/immagini/main/logo_pulito.png"
+
+col_left, col_logo, col_right = st.columns([1, 1.5, 1])
+with col_logo:
+    # Mostra l'immagine direttamente dal web; se non è raggiungibile usa il testo di backup elegante
+    try:
+        st.image("https://images.squarespace-cdn.com/content/v1/6463ba313c4a2233c1626f23/1684311855271-XCHVZZOPFFS2O6U5LFFB/logo.png", use_container_width=True)
+    except:
+        st.markdown("""
+        <div style="text-align: center; margin-bottom: 10px;">
+            <h1 style="color: #b91c1c; font-family: 'Outfit', sans-serif; font-size: 38px; font-weight: 800; letter-spacing: 1px; margin-bottom: 0px;">
+                CARRELLO<span style="color: #00a8cc;">SNELLO</span>
+            </h1>
+        </div>
+        """, unsafe_allow_html=True)
 
 # Slogan del Brand
 st.markdown("""
@@ -98,10 +103,8 @@ else:
     st.error("Errore critico: File 'prodotti.csv' non trovato. Assicurati che sia nella stessa cartella dello script.")
     st.stop()
 
-# Estrazione dinamica delle colonne dei negozi (esclude Prodotto e Immagine)
 nomi_farmacie = [col for col in df_prezzi.columns if col not in ["Prodotto", "Immagine"]]
 
-# Configurazione fissa delle regole di spedizione
 farmacie_info = {
     "Farmacia Igea": {"spedizione_fissa": 4.90, "soglia_gratis": 49.00},
     "Farmacia Loreto": {"spedizione_fissa": 3.90, "soglia_gratis": 39.90},
@@ -146,8 +149,8 @@ if cerca_testo != "":
                 with col_text:
                     st.markdown(f"""
                         <div style='padding-top: 5px;'>
-                            <span style='font-size: 15px; font-weight: 600; color: #1e3a8a;'>{prod}</span><br>
-                            <span style='background-color: #d1fae5; color: #065f46; font-size: 11px; font-weight: bold; padding: 2px 6px; border-radius: 4px;'>
+                            <span style='font-size: 15px; font-weight: 600; color: #1e293b;'>{prod}</span><br>
+                            <span style='background-color: #fee2e2; color: #991b1b; font-size: 11px; font-weight: bold; padding: 2px 6px; border-radius: 4px;'>
                                 🔥 Miglior prezzo su {farmacia_migliore}: {prezzo_migliore:.2f}€
                             </span>
                         </div>
@@ -181,7 +184,6 @@ if prodotti_selezionati:
     df_filtrato = df_prezzi[df_prezzi["Prodotto"].isin(prodotti_selezionati)]
     
     risultati_singoli = []
-    # RISOLTO ACCURATAMENTE: Filtriamo solo le farmacie reali censite in farmacie_info per evitare KeyError
     farmacie_valide = [f for f in nomi_farmacie if f in farmacie_info]
     
     for nome_farmacia in farmacie_valide:
@@ -191,7 +193,7 @@ if prodotti_selezionati:
         totale_complessivo = totale_prodotti + costo_spedizione
         
         if costo_spedizione == 0.0:
-            info_sped = "<span style='color: #22c55e; font-weight: bold;'>Spedizione GRATIS</span>"
+            info_sped = "<span style='color: #16a34a; font-weight: bold;'>Spedizione GRATIS</span>"
             suggerimento = ""
         else:
             info_sped = f"Spedizione: {costo_spedizione:.2f}€"
@@ -213,7 +215,6 @@ if prodotti_selezionati:
     best_split_arrangement = None
     prodotti_lista = df_filtrato["Prodotto"].tolist()
     
-    # Ottimizzazione combinatoria (fino a un massimo di 5 prodotti per motivi di performance)
     if len(prodotti_lista) <= 5:
         for assegnazione in itertools.product(farmacie_valide, repeat=len(prodotti_lista)):
             partizione = {f: [] for f in farmacie_valide}
@@ -240,8 +241,8 @@ if prodotti_selezionati:
         risparmio_netto = miglior_singolo - best_split_cost
         st.markdown(f"""
         <div class="split-card">
-            <div style="font-size: 28px; font-weight: 800; float: right; color: #0288d1;">{best_split_cost:.2f} €</div>
-            <div style="font-size: 19px; font-weight: 900; color: #1e3a8a;">🚀 Ottimizzazione: conviene dividere l'ordine!</div>
+            <div style="font-size: 28px; font-weight: 800; float: right; color: #00a8cc;">{best_split_cost:.2f} €</div>
+            <div style="font-size: 19px; font-weight: 900; color: #0f172a;">🚀 Ottimizzazione: conviene dividere l'ordine!</div>
             <div style="font-size: 13px; color: #166534; font-weight: 700; margin-top: 5px; background-color: #d1fae5; padding: 4px 8px; border-radius: 4px; display: inline-block;">
                 🔥 Risparmio extra: {risparmio_netto:.2f} € rispetto a un negozio unico
             </div>
@@ -273,12 +274,12 @@ if prodotti_selezionati:
     for row in df_risultati_singoli.itertuples():
         is_vincitore = (row.Index == 0 and not best_split_arrangement)
         card_class = "vincitore-card" if is_vincitore else "farmacia-card"
-        prezzo_color = "#22c55e" if is_vincitore else "#1e3a8a"
+        prezzo_color = "#b91c1c" if is_vincitore else "#1e293b"
         
         st.markdown(f"""
         <div class="{card_class}">
             <div style="font-size: 24px; font-weight: 800; float: right; color: {prezzo_color};">{row.Prezzo_Finale:.2f} €</div>
-            <div style="font-size: 17px; font-weight: bold; color: #1e3a8a;">
+            <div style="font-size: 17px; font-weight: bold; color: #0f172a;">
                 🏢 {row.Farmacia}
             </div>
             <div style="font-size: 13px; color: #475569; margin-top: 6px;">

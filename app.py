@@ -13,7 +13,7 @@ st.set_page_config(
 # 2. Iniezione CSS globale per layout, card e font
 st.markdown("""
 <style>
-@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght=400;600;800&display=swap');
 
 html, body, [data-testid="stMarkdownContainer"] p {
     font-family: 'Outfit', 'Helvetica Neue', Arial, sans-serif !important;
@@ -61,7 +61,7 @@ html, body, [data-testid="stMarkdownContainer"] p {
 </style>
 """, unsafe_allow_html=True)
 
-# 3. LOGO VETTORIALE IDENTICO AL MOCKUP (image_5b208f.png)
+# 3. LOGO VETTORIALE RACCORDATO (image_5b208f.png)
 st.components.v1.html("""
 <div style="display: flex; justify-content: center; align-items: center; margin-bottom: 5px;">
 <svg width="200" height="130" viewBox="0 0 200 130" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -73,7 +73,7 @@ st.components.v1.html("""
   
   <path d="M130 54H139L142 43" stroke="#1E3A8A" stroke-width="4.5" stroke-linecap="round" stroke-linejoin="round"/>
 
-  <path d="M73 44H131L126 50.5C136 48.5 149 43.5 163 33C152 42 145 46.5 153.5 48C167 50 179 45 185 40C171 53 158 54 148.5 55C161.5 59 172 58 176.5 55.5C161.5 66 145 64 132 64L121 78H83L73 44Z" fill="#5D9CEC"/>
+  <path d="M73 44H131L126 50.5C136 48.5 149 43.5 163 33C152 42 145 46.5 153.5 48C167 50 179 45 185 40C171 53 158 54 148.5 55C161.5 59 172 58 176.5 55.5C161.5 66 145 64 132 64L121 78H83L73 44Z" fill="#0288d1"/>
   
   <path d="M128 52.5C140 52.5 151.5 49 159 44" stroke="#ffffff" stroke-width="2.5" stroke-linecap="round"/>
   <path d="M130 58.5C141 58.5 149.5 56 155 52.5" stroke="#ffffff" stroke-width="2" stroke-linecap="round"/>
@@ -83,7 +83,7 @@ st.components.v1.html("""
 </div>
 """, height=135)
 
-# 4. Intestazione Brand
+# 4. Intestazione Brand con Doppio Colore Ripristinato (Blu Notte e Azzurro)
 st.markdown("""
 <div style="text-align: center; margin-bottom: 25px;">
     <h1 style="color: #1e3a8a; font-family: 'Outfit', sans-serif; font-size: 38px; font-weight: 800; letter-spacing: 1px; margin-bottom: 0px;">
@@ -171,27 +171,4 @@ if cerca_testo != "":
 
 st.write("---")
 
-# --- RIEPILOGO DEL CARRELLO ---
-st.markdown("""<div class="title-with-icon">🛒 Il tuo carrello attuale:</div>""", unsafe_allow_html=True)
-
-prodotti_selezionati = st.multiselect(
-    "Puoi rimuovere gli elementi cliccando sulla 'x':",
-    options=df_prezzi["Prodotto"].tolist(),
-    default=st.session_state.carrello_spesa
-)
-st.session_state.carrello_spesa = prodotti_selezionati
-
-# --- CORE ALGORITMO DI SPLIT ---
-if prodotti_selezionati:
-    df_filtrato = df_prezzi[df_prezzi["Prodotto"].isin(prodotti_selezionati)]
-    
-    risultati_singoli = []
-    for nome_farmacia in nomi_farmacie:
-        regole = farmacie_info[nome_farmacia]
-        totale_prodotti = float(df_filtrato[nome_farmacia].sum())
-        costo_spedizione = 0.0 if totale_prodotti >= regole["soglia_gratis"] else regole["spedizione_fissa"]
-        totale_complessivo = totale_prodotti + costo_spedizione
-        
-        info_sped = "<span style='color: #22c55e; font-weight: bold;'>Spedizione GRATIS</span>" if costo_spedizione == 0.0 else f"Spedizione: {costo_spedizione:.2f}€"
-        mancante = regole["soglia_gratis"] - totale_prodotti
-        suggerimento = f"<div style='background-color: #fef08a; border-left: 4px solid #facc15; padding: 10px; font-size:13px; border-radius:4px; margin-top:8px;'>💡 Aggiungi <b>{mancante:.2f}€</b>
+# ---

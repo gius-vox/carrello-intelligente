@@ -58,20 +58,23 @@ html, body, [data-testid="stMarkdownContainer"] p {
 </style>
 """, unsafe_allow_html=True)
 
-# 3. Logo Brand (La C Dinamica Tech e Snella)
+# 3. LOGO BRAND CORRETTO E CENTRATO (La C che contiene il Carrello)
 st.components.v1.html("""
 <div style="display: flex; justify-content: center; align-items: center; margin-bottom: 10px;">
-<svg width="90" height="90" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
-<circle cx="50" cy="50" r="42" fill="#f1f5f9"/>
-<path d="M65 35C60 28 45 28 38 35C30 42 30 58 38 65C45 72 60 72 65 65" stroke="#1e3a8a" stroke-width="7" stroke-linecap="round"/>
-<path d="M48 65H68L74 48" stroke="#0288d1" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
-<circle cx="56" cy="74" r="3" fill="#0288d1"/>
-<circle cx="66" cy="74" r="3" fill="#0288d1"/>
+<svg width="100" height="100" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <circle cx="50" cy="50" r="44" fill="#f1f5f9"/>
+  
+  <path d="M66 36C61 29 47 29 40 36C32 43 32 57 40 64C47 71 61 71 66 64" stroke="#1e3a8a" stroke-width="7.5" stroke-linecap="round"/>
+  
+  <path d="M46 54H64L68 42H50" stroke="#0288d1" stroke-width="4.5" stroke-linejoin="round" stroke-linecap="round"/>
+  
+  <circle cx="51" cy="61" r="3.5" fill="#0288d1"/>
+  <circle cx="61" cy="61" r="3.5" fill="#0288d1"/>
 </svg>
 </div>
-""", height=100)
+""", height=110)
 
-# 4. Intestazione Brand (Nuovo Nome!)
+# 4. Intestazione Brand
 st.markdown("""
 <div style="text-align: center; margin-bottom: 25px;">
     <h1 style="color: #1e3a8a; font-family: 'Helvetica Neue', Arial, sans-serif; font-size: 44px; font-weight: 800;">

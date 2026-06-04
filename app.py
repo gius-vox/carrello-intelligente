@@ -10,7 +10,7 @@ st.set_page_config(
     layout="centered"
 )
 
-# 2. Iniezione CSS globale coordinata con i NUOVI colori del logo (Rosso e Azzurro)
+# 2. Iniezione CSS globale coordinata con i colori del brand
 st.markdown("""
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Outfit:wght=400;600;800&display=swap');
@@ -66,23 +66,24 @@ html, body, [data-testid="stMarkdownContainer"] p {
 </style>
 """, unsafe_allow_html=True)
 
-# 3. CARICAMENTO LOGO (URL Diretto all'immagine con sfondo trasparente e senza quadretti)
+# 3. Caricamento Logo dall'archivio cloud (Trasparente, ottimizzato per sfondo chiaro)
 logo_url = "https://i.imgur.com/vH6v97D.png"
 
 col_left, col_logo, col_right = st.columns([1, 1.2, 1])
 with col_logo:
     try:
         st.image(logo_url, use_container_width=True)
-    except:
+    except Exception:
+        # Fallback testuale elegante se l'immagine remota fallisce il caricamento
         st.markdown("""
         <div style="text-align: center; margin-bottom: 10px;">
-            <h1 style="color: #b91c1c; font-family: 'Outfit', sans-serif; font-size: 38px; font-weight: 800; letter-spacing: 1px; margin-bottom: 0px;">
+            <h1 style="color: #b91c1c; font-family: 'Outfit', sans-serif; font-size: 34px; font-weight: 800; letter-spacing: 1px; margin-bottom: 0px;">
                 CARRELLO<span style="color: #00a8cc;">SNELLO</span>
             </h1>
         </div>
         """, unsafe_allow_html=True)
 
-# Slogan del Brand
+# Slogan della piattaforma
 st.markdown("""
 <div style="text-align: center; margin-bottom: 25px;">
     <p style="color: #475569; font-family: 'Outfit', sans-serif; font-size: 13px; font-weight: 500; letter-spacing: 3px; text-transform: uppercase; margin-top: 5px; margin-bottom: 20px;">
@@ -93,16 +94,7 @@ st.markdown("""
 
 st.write("---")
 
-# 4. Caricamento e controllo del database CSV
-csv_path = "prodotti.csv"
-if os.path.exists(csv_path):
-    df_prezzi = pd.read_csv(csv_path)
-else:
-    st.error("Errore critico: File 'prodotti.csv' non trovato.")
-    st.stop()
-
-nomi_farmacie = [col for col in df_prezzi.columns if col not in ["Prodotto", "Immagine"]]
-
+# 4. Configurazione delle regole delle farmacie supportate
 farmacie_info = {
     "Farmacia Igea": {"spedizione_fissa": 4.90, "soglia_gratis": 49.00},
     "Farmacia Loreto": {"spedizione_fissa": 3.90, "soglia_gratis": 39.90},
@@ -110,6 +102,22 @@ farmacie_info = {
     "Dr. Max": {"spedizione_fissa": 4.50, "soglia_gratis": 59.90}
 }
 
+# 5. Caricamento sicuro del Database CSV
+csv_path = "prodotti.csv"
+if os.path.exists(csv_path):
+    df_prezzi = pd.read_csv(csv_path)
+else:
+    st.error("Errore critico: File 'prodotti.csv' non trovato nella cartella principale.")
+    st.stop()
+
+# Estraiamo le colonne delle farmacie prendendo SOLO quelle effettivamente configurate nel dizionario
+nomi_farmacie = [col for col in df_prezzi.columns if col in farmacie_info]
+
+if not nomi_farmacie:
+    st.error("Errore: Nessuna colonna del file CSV corrisponde alle farmacie registrate nel sistema.")
+    st.stop()
+
+# Inizializzazione del carrello predefinito con i prodotti campione se vuoto
 if "carrello_spesa" not in st.session_state:
     st.session_state.carrello_spesa = [
         "Sustenium Plus Energizzante 22 bustine",
@@ -118,7 +126,7 @@ if "carrello_spesa" not in st.session_state:
     ]
 
 # --- SEZIONE: RICERCA PRODOTTO ---
-st.markdown('<div class="title-with-icon">🔍 Cerca un prodotto nel database:</div>', unsafe_allow_html=True)
+st.markdown("""<div class="title-with-icon">🔍 Cerca un prodotto nel database:</div>""", unsafe_allow_html=True)
 
 lista_prodotti = sorted(df_prezzi["Prodotto"].unique().tolist())
 cerca_testo = st.selectbox(
@@ -129,12 +137,13 @@ cerca_testo = st.selectbox(
 )
 
 if cerca_testo != "":
-    df_trovati = df_prezzi[df_prezzi["Prodotto"].str.contains(cerca_testo, case=False)]
+    df_trovati = df_prezzi[df_prezzi["Prodotto"].str.contains(cerca_testo, case=False, na=False)]
     if not df_trovati.empty:
         st.write(f"Prodotti trovati ({len(df_trovati)}):")
         for index, row in df_trovati.iterrows():
             prod = row["Prodotto"]
-            img_url = row["Immagine"]
+            # Gestione sicura del link immagine prodotto
+            img_url = row["Immagine"] if pd.notna(row["Immagine"]) else "https://via.placeholder.com/45"
             
             prezzi_prodotto = {k: float(row[k]) for k in nomi_farmacie if pd.notna(row[k])}
             if prezzi_prodotto:
@@ -154,7 +163,7 @@ if cerca_testo != "":
                         </div>
                     """, unsafe_allow_html=True)
                 with col_btn:
-                    st.markdown("<div style='padding-top: 10px;'>", unsafe_allow_html=True)
+                    st.markdown("<div style='padding-top: 10px;'>", unsafe_allow_width=True)
                     if prod in st.session_state.carrello_spesa:
                         st.button("Incluso", key=f"btn_in_{index}", disabled=True)
                     else:
@@ -168,7 +177,7 @@ if cerca_testo != "":
 st.write("---")
 
 # --- RIEPILOGO DEL CARRELLO ---
-st.markdown('<div class="title-with-icon">🛒 Il tuo carrello attuale:</div>', unsafe_allow_html=True)
+st.markdown("""<div class="title-with-icon">🛒 Il tuo carrello attuale:</div>""", unsafe_allow_html=True)
 
 prodotti_selezionati = st.multiselect(
     "Puoi rimuovere gli elementi cliccando sulla 'x':",
@@ -182,9 +191,8 @@ if prodotti_selezionati:
     df_filtrato = df_prezzi[df_prezzi["Prodotto"].isin(prodotti_selezionati)]
     
     risultati_singoli = []
-    farmacie_valide = [f for f in nomi_farmacie if f in farmacie_info]
     
-    for nome_farmacia in farmacie_valide:
+    for nome_farmacia in nomi_farmacie:
         regole = farmacie_info[nome_farmacia]
         totale_prodotti = float(df_filtrato[nome_farmacia].sum())
         costo_spedizione = 0.0 if totale_prodotti >= regole["soglia_gratis"] else regole["spedizione_fissa"]
@@ -196,7 +204,7 @@ if prodotti_selezionati:
         else:
             info_sped = f"Spedizione: {costo_spedizione:.2f}€"
             mancante = regole["soglia_gratis"] - totale_prodotti
-            suggerimento = f"<div style='background-color: #fef08a; border-left: 4px solid #facc15; padding: 10px; font-size:13px; border-radius:4px; margin-top:8px;'>💡 Aggiungi <b>{mancante:.2f}€</b> su {nome_farmacia} per azzerare la spedizione!</div>"
+            suggerimento = f"""<div style='background-color: #fef08a; border-left: 4px solid #facc15; padding: 10px; font-size:13px; border-radius:4px; margin-top:8px;'>💡 Aggiungi <b>{mancante:.2f}€</b> su {nome_farmacia} per azzerare la spedizione!</div>"""
         
         risultati_singoli.append({
             "Farmacia": nome_farmacia, 
@@ -213,9 +221,10 @@ if prodotti_selezionati:
     best_split_arrangement = None
     prodotti_lista = df_filtrato["Prodotto"].tolist()
     
+    # Ottimizzazione combinatoria (attivata fino a un massimo di 5 prodotti per performance)
     if len(prodotti_lista) <= 5:
-        for assegnazione in itertools.product(farmacie_valide, repeat=len(prodotti_lista)):
-            partizione = {f: [] for f in farmacie_valide}
+        for assegnazione in itertools.product(nomi_farmacie, repeat=len(prodotti_lista)):
+            partizione = {f: [] for f in nomi_farmacie}
             for prod, farmacia in zip(prodotti_lista, assegnazione):
                 partizione[farmacia].append(prod)
                 
@@ -225,7 +234,7 @@ if prodotti_selezionati:
                     sub_df = df_filtrato[df_filtrato["Prodotto"].isin(prods_assegnati)]
                     tot_prod = float(sub_df[f].sum())
                     costo_sped = 0.0 if tot_prod >= farmacie_info[f]["soglia_gratis"] else farmacie_info[f]["spedizione_fissa"]
-                    costo_corrente += (tot_prod + costo_sped)
+                    costo_corrente += (tot_prod + codebase_sped if 'codebase_sped' in locals() else costo_sped)
                     
             if costo_corrente < best_split_cost - 0.10:
                 best_split_cost = costo_corrente
@@ -233,7 +242,7 @@ if prodotti_selezionati:
 
     # --- VISUALIZZAZIONE SEZIONE INTELLIGENTE ---
     st.write("")
-    st.markdown('<div class="title-with-icon">✨ Strategia d'Acquisto Intelligente:</div>'.replace("d'Acquisto", "d\'Acquisto"), unsafe_allow_html=True)
+    st.markdown("""<div class="title-with-icon">✨ Strategia d'Acquisto Intelligente:</div>""", unsafe_allow_html=True)
     
     if best_split_arrangement:
         risparmio_netto = miglior_singolo - best_split_cost
@@ -267,7 +276,7 @@ if prodotti_selezionati:
     st.write("---")
     
     # Elenco farmacie singole
-    st.markdown('<div class="title-with-icon">🏪 Ordinare da un\'unica farmacia:</div>', unsafe_allow_html=True)
+    st.markdown("""<div class="title-with-icon">🏪 Ordinare da un'unica farmacia:</div>""", unsafe_allow_html=True)
     
     for row in df_risultati_singoli.itertuples():
         is_vincitore = (row.Index == 0 and not best_split_arrangement)

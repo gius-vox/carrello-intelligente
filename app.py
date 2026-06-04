@@ -5,12 +5,12 @@ import os
 
 # 1. Impostazione della pagina nativa
 st.set_page_config(
-    page_title="CarrelloSnello - Il tuo carrello ottimizzato al grammo",
+    page_title="CarrelloSnello - Il tuo carrello ottimizzato",
     page_icon="🛒",
     layout="centered"
 )
 
-# 2. Iniezione CSS globale per layout, card e font personalizzato
+# 2. Iniezione CSS globale per layout, card e font
 st.markdown("""
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;800&display=swap');
@@ -60,57 +60,55 @@ html, body, [data-testid="stMarkdownContainer"] p {
 </style>
 """, unsafe_allow_html=True)
 
-# 3. RIPRODUZIONE LOGO "CARRELLO ALATO" (Basato sul tuo modello)
+# 3. LOGO RIPROGETTATO: CARRELLO AERODINAMICO CHE SFRECCIA
 st.components.v1.html("""
 <div style="display: flex; justify-content: center; align-items: center; margin-bottom: 5px;">
-<svg width="160" height="110" viewBox="0 0 160 110" fill="none" xmlns="http://www.w3.org/2000/svg">
-  <path d="M43 40L48 68H81L86 35H92" stroke="#102a6b" stroke-width="4.5" stroke-linecap="round" stroke-linejoin="round"/>
-  <path d="M44 74H84" stroke="#102a6b" stroke-width="4.5" stroke-linecap="round"/>
+<svg width="180" height="110" viewBox="0 0 180 110" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <ellipse cx="62" cy="86" rx="4" ry="6" fill="#102a6b" transform="rotate(-5 62 86)"/>
+  <ellipse cx="94" cy="86" rx="4" ry="6" fill="#102a6b" transform="rotate(-5 94 86)"/>
   
-  <path d="M43 40H86L81 68H48L43 40Z" fill="#6ba4f4"/>
+  <path d="M52 77H100" stroke="#102a6b" stroke-width="4.5" stroke-linecap="round"/>
+  <path d="M53 77L59 40M98 77L105 45" stroke="#102a6b" stroke-width="4.5" stroke-linecap="round"/>
   
-  <path d="M68 49.5C66.5 47 63.5 47 61.5 49.5C59 52 59 56 61.5 58.5C63.5 61 66.5 61 68 58.5" stroke="#ffffff" stroke-width="4" stroke-linecap="round"/>
+  <path d="M104 42H111L113 35" stroke="#102a6b" stroke-width="4.5" stroke-linecap="round" stroke-linejoin="round"/>
+
+  <path d="M54 39H98C108 39 122 33 134 25C124 35 116 39 126 41C138 43 148 37 154 33C142 45 130 46 122 47C134 50 142 49 146 47C134 56 118 55 102 55L92 69H60L54 39Z" fill="#6ba4f4" stroke="#6ba4f4" stroke-width="1" stroke-linejoin="round"/>
   
-  <ellipse cx="51" cy="83" rx="3.5" ry="5" fill="#102a6b"/>
-  <ellipse cx="78" cy="83" rx="3.5" ry="5" fill="#102a6b"/>
-  
-  <path d="M85 45C100 45 112 37 112 37C112 37 104 51 90 53" fill="#6ba4f4"/>
-  <path d="M84 53C103 53 115 46 115 46C115 46 105 59 89 60" fill="#6ba4f4"/>
-  <path d="M82 61C97 62 107 56 107 56C107 56 99 67 82 67" fill="#6ba4f4"/>
+  <path d="M102 43C114 43 124 39 130 35" stroke="#ffffff" stroke-width="2.5" stroke-linecap="round"/>
+  <path d="M105 49C115 49 122 47 127 44" stroke="#ffffff" stroke-width="2" stroke-linecap="round"/>
+
+  <path d="M79 47C76.5 45 73 45 71 47.5C68.5 50.5 68.5 55.5 71 58.5C73 61 76.5 61 79 59" stroke="#ffffff" stroke-width="4.5" stroke-linecap="round"/>
 </svg>
 </div>
 """, height=115)
 
-# 4. Intestazione Brand (Stile del Mockup)
+# 4. Intestazione Brand
 st.markdown("""
 <div style="text-align: center; margin-bottom: 25px;">
-    <h1 style="color: #6ba4f4; font-family: 'Outfit', sans-serif; font-size: 38px; font-weight: 600; letter-spacing: 4px; text-transform: uppercase; margin-bottom: 0px;">
+    <h1 style="color: #102a6b; font-family: 'Outfit', sans-serif; font-size: 36px; font-weight: 800; letter-spacing: 2px; text-transform: uppercase; margin-bottom: 0px;">
         CARRELLO<span style="color: #6ba4f4;">SNELLO</span>
     </h1>
-    <p style="color: #102a6b; font-family: 'Outfit', sans-serif; font-size: 12px; font-weight: 800; letter-spacing: 3px; text-transform: uppercase; margin-top: 5px; margin-bottom: 20px;">
+    <p style="color: #6ba4f4; font-family: 'Outfit', sans-serif; font-size: 13px; font-weight: 600; letter-spacing: 4px; text-transform: uppercase; margin-top: 3px; margin-bottom: 20px;">
         Smart Shopping Algorithm
-    </p>
-    <p style="color: #475569; font-family: 'Outfit', sans-serif; font-size: 15px; font-weight: 400; max-width: 600px; margin: 0 auto;">
-        L'algoritmo intelligente che alleggerisce la spesa, azzera le spedizioni e ottimizza i tuoi ordini farmaceutici.
     </p>
 </div>
 """, unsafe_allow_html=True)
 
 st.write("---")
 
-# 5. Caricamento sicuro del Database CSV esterno
+# 5. Caricamento Database CSV
 csv_path = "prodotti.csv"
 if os.path.exists(csv_path):
     df_prezzi = pd.read_csv(csv_path)
 else:
-    st.error("Errore critico: File 'prodotti.csv' non trovato. Assicurati di averlo caricato su GitHub insieme ad app.py.")
+    st.error("Errore critico: File 'prodotti.csv' non trovato.")
     st.stop()
 
-# Rilevamento automatico delle colonne delle farmacie presenti nel tuo CSV
+# Estrazione pulita dei nomi delle farmacie dalle colonne
 nomi_farmacie = [col for col in df_prezzi.columns if col not in ["Prodotto", "Immagine"]]
 
-# Dizionario per le regole di spedizione
-regole_spedizione_base = {
+# Configurazione robusta delle regole di spedizione (mappa sia i nomi brevi che estesi)
+regole_config = {
     "Igea": {"spedizione_fissa": 4.90, "soglia_gratis": 49.00},
     "Loreto": {"spedizione_fissa": 3.90, "soglia_gratis": 39.90},
     "Raven": {"spedizione_fissa": 5.90, "soglia_gratis": 29.90},
@@ -123,92 +121,75 @@ regole_spedizione_base = {
 
 farmacie_info = {}
 for col in nomi_farmacie:
-    if col in regole_spedizione_base:
-        farmacie_info[col] = regole_spedizione_base[col]
+    pulita = col.replace("Farmacia ", "").replace("Dr. ", "Dr").strip()
+    match_trovato = None
+    for k, v in regole_config.items():
+        if k.lower() in col.lower() or col.lower() in k.lower():
+            match_trovato = v
+            break
+    if match_trovato:
+        farmacie_info[col] = match_trovato
     else:
         farmacie_info[col] = {"spedizione_fissa": 4.50, "soglia_gratis": 49.00}
 
-# Set state iniziale del carrello
+# Inizializzazione dello stato del carrello
 if "carrello_spesa" not in st.session_state:
-    st.session_state.carrello_spesa = [
-        "Sustenium Plus Energizzante 22 bustine",
-        "La Roche-Posay Anthelios XL 50+",
-        "Tachipirina 1000mg Orosolubile 12 cpr"
-    ]
+    st.session_state.carrello_spesa = []
 
 # --- SEZIONE: RICERCA PRODOTTO ---
-st.markdown("""
-<div class="title-with-icon">
-    <span style="font-size: 20px;">🔍 Cerca un prodotto nel database (300+ disponibili):</span>
-</div>
-""", unsafe_allow_html=True)
+st.markdown('<div class="title-with-icon">🔍 Cerca un prodotto nel database:</div>', unsafe_allow_html=True)
 
 lista_prodotti = sorted(df_prezzi["Prodotto"].unique().tolist())
-
 cerca_testo = st.selectbox(
-    "Digita o seleziona cosa stai cercando...",
+    "Seleziona un farmaco da aggiungere:",
     options=[""] + lista_prodotti,
     index=0,
-    placeholder="Scrivi qui il nome del farmaco (es. Tachipirina...)"
+    placeholder="Scrivi il nome del farmaco..."
 )
 
 if cerca_testo != "":
     df_trovati = df_prezzi[df_prezzi["Prodotto"] == cerca_testo]
-    
     if not df_trovati.empty:
-        st.write(f"Prodotti trovati ({len(df_trovati)}):")
-        
         for index, row in df_trovati.iterrows():
             prod = row["Prodotto"]
             img_url = row["Immagine"]
             
-            prezzi_prodotto = row[nomi_farmacie].to_dict()
-            farmacia_migliore = min(prezzi_prodotto, key=prezzi_prodotto.get)
-            prezzo_migliore = prezzi_prodotto[farmacia_migliore]
-            
-            col_img, col_text, col_btn = st.columns([1, 4, 2])
-            
-            with col_img:
-                st.image(img_url, width=45)
+            prezzi_prodotto = {k: float(row[k]) for k in nomi_farmacie if pd.notna(row[k])}
+            if prezzi_prodotto:
+                farmacia_migliore = min(prezzi_prodotto, key=prezzi_prodotto.get)
+                prezzo_migliore = prezzi_prodotto[farmacia_migliore]
                 
-            with col_text:
-                st.markdown(f"""
-                    <div style='padding-top: 5px;'>
-                        <span style='font-size: 15px; font-weight: 600; color: #1e3a8a;'>{prod}</span>
-                        <span style='background-color: #d1fae5; color: #065f46; font-size: 11px; font-weight: bold; padding: 2px 6px; border-radius: 4px; margin-left: 8px;'>
-                            🔥 Miglior prezzo su {farmacia_migliore}: {prezzo_migliore:.2f}€
-                        </span>
-                    </div>
-                """, unsafe_allow_html=True)
-                
-            with col_btn:
-                st.markdown("<div style='padding-top: 4px;'>", unsafe_allow_html=True)
-                if prod in st.session_state.carrello_spesa:
-                    st.button("Incluso", key=f"btn_in_{index}", disabled=True)
-                else:
-                    if st.button("Aggiungi", key=f"btn_add_{index}"):
-                        st.session_state.carrello_spesa.append(prod)
-                        st.rerun()
-                st.markdown("</div>", unsafe_allow_html=True)
-else:
-    st.info("Usa la barra sopra per cercare e aggiungere farmaci al carrello.")
+                col_img, col_text, col_btn = st.columns([1, 4, 2])
+                with col_img:
+                    st.image(img_url, width=45)
+                with col_text:
+                    st.markdown(f"""
+                        <div style='padding-top: 5px;'>
+                            <span style='font-size: 15px; font-weight: 600; color: #1e3a8a;'>{prod}</span><br>
+                            <span style='background-color: #d1fae5; color: #065f46; font-size: 11px; font-weight: bold; padding: 2px 6px; border-radius: 4px;'>
+                                🔥 Miglior prezzo su {farmacia_migliore}: {prezzo_migliore:.2f}€
+                            </span>
+                        </div>
+                    """, unsafe_allow_html=True)
+                with col_btn:
+                    st.markdown("<div style='padding-top: 10px;'>", unsafe_allow_html=True)
+                    if prod in st.session_state.carrello_spesa:
+                        st.button("Incluso", key=f"btn_in_{index}", disabled=True)
+                    else:
+                        if st.button("Aggiungi", key=f"btn_add_{index}"):
+                            st.session_state.carrello_spesa.append(prod)
+                            st.rerun()
+                    st.markdown("</div>", unsafe_allow_html=True)
 
 st.write("---")
 
 # --- RIEPILOGO DEL CARRELLO ---
-st.markdown("""
-<div class="title-with-icon">
-    <span style="font-size: 20px;">🛒 Il tuo carrello attuale:</span>
-</div>
-""", unsafe_allow_html=True)
-
-prodotti_validi_default = [p for p in st.session_state.carrello_spesa if p in df_prezzi["Prodotto"].values]
+st.markdown('<div class="title-with-icon">🛒 Il tuo carrello attuale:</div>', unsafe_allow_html=True)
 
 prodotti_selezionati = st.multiselect(
-    "Puoi rimuovere gli elementi cliccando sulla 'x':",
+    "Rimuovi gli elementi cliccando sulla 'x':",
     options=df_prezzi["Prodotto"].tolist(),
-    default=prodotti_validi_default,
-    label_visibility="visible"
+    default=st.session_state.carrello_spesa
 )
 st.session_state.carrello_spesa = prodotti_selezionati
 
@@ -225,16 +206,14 @@ if prodotti_selezionati:
         
         info_sped = "<span style='color: #22c55e; font-weight: bold;'>Spedizione GRATIS</span>" if costo_spedizione == 0.0 else f"Spedizione: {costo_spedizione:.2f}€"
         mancante = regole["soglia_gratis"] - totale_prodotti
-        suggerimento = f"<div style='background-color: #fef08a; border-left: 4px solid #facc15; padding: 10px; font-size:13px; border-radius:4px;'>💡 Aggiungi <b>{mancante:.2f}€</b> per azzerare la spedizione!</div>" if costo_spedizione > 0.0 else ""
+        suggerimento = f"<div style='background-color: #fef08a; border-left: 4px solid #facc15; padding: 10px; font-size:13px; border-radius:4px; margin-top:8px;'>💡 Aggiungi <b>{mancante:.2f}€</b> per azzerare la spedizione!</div>" if costo_spedizione > 0.0 else ""
         
         risultati_singoli.append({
             "Farmacia": nome_farmacia, "Totale_Prodotti": totale_prodotti,
             "Info_Spedizione": info_sped, "Suggerimento": suggerimento, "Prezzo_Finale": totale_complessivo
         })
         
-    df_risultati_singoli = pd.DataFrame(risultati_singoli)
-    df_risultati_singoli = df_risultati_singoli.sort_values(by="Prezzo_Finale").reset_index(drop=True)
-    
+    df_risultati_singoli = pd.DataFrame(risultati_singoli).sort_values(by="Prezzo_Finale").reset_index(drop=True)
     miglior_singolo = df_risultati_singoli.iloc[0]["Prezzo_Finale"]
     
     best_split_cost = miglior_singolo
@@ -261,24 +240,18 @@ if prodotti_selezionati:
 
     # --- VISUALIZZAZIONE SEZIONE INTELLIGENTE ---
     st.write("")
-    st.markdown("""
-    <div class="title-with-icon">
-        <span style="font-size: 20px;">✨ Strategia d'Acquisto Intelligente:</span>
-    </div>
-    """, unsafe_allow_html=True)
+    st.markdown('<div class="title-with-icon">✨ Strategia d'Acquisto Intelligente:</div>', unsafe_allow_html=True)
     
     if best_split_arrangement:
         risparmio_netto = miglior_singolo - best_split_cost
         st.markdown(f"""
         <div class="split-card">
             <div style="font-size: 28px; font-weight: 800; float: right; color: #0288d1;">{best_split_cost:.2f} €</div>
-            <div style="font-size: 20px; font-weight: 900; color: #1e3a8a;">🚀 Ottimizzazione: conviene dividere l'ordine!</div>
-            <div style="font-size: 14px; color: #166534; font-weight: 700; margin-top: 5px; background-color: #d1fae5; padding: 4px 8px; border-radius: 4px; display: inline-block;">
+            <div style="font-size: 19px; font-weight: 900; color: #1e3a8a;">🚀 Ottimizzazione: conviene dividere l'ordine!</div>
+            <div style="font-size: 13px; color: #166534; font-weight: 700; margin-top: 5px; background-color: #d1fae5; padding: 4px 8px; border-radius: 4px; display: inline-block;">
                 🔥 Risparmio extra: {risparmio_netto:.2f} € rispetto a un negozio unico
             </div>
-            <div style="margin-top: 15px; font-size: 14px; color: #334155; margin-bottom: 10px;">
-                <b>Ripartizione consigliata nei carrelli:</b>
-            </div>
+            <div style="margin-top: 15px; font-size: 14px; color: #334155; margin-bottom: 10px;"><b>Ripartizione consigliata nei carrelli:</b></div>
         """, unsafe_allow_html=True)
         
         for farmacia, prods in best_split_arrangement.items():
@@ -291,52 +264,33 @@ if prodotti_selezionati:
     else:
         st.markdown("""
         <div class="split-card-info">
-            <div style="font-size: 16px; font-weight: bold; color: #475569; display: flex; align-items: center; gap: 8px;">
-                Controllo combinatorio eseguito
-            </div>
-            <p style="font-size: 14px; color: #64748b; margin-top: 6px; margin-bottom: 0; line-height: 1.4;">
-                L'algoritmo ha verificato ogni combinazione di split. Dividere l'ordine non conviene: le spese di spedizione multiple annullerebbero il risparmio sui prodotti. Conviene ordinare tutto da un unico negozio.
+            <div style="font-size: 15px; font-weight: bold; color: #475569;">🛡️ Controllo combinatorio eseguito</div>
+            <p style="font-size: 14px; color: #64748b; margin-top: 6px; margin-bottom: 0;">
+                Dividere l'ordine non conviene: le spese di spedizione multiple annullerebbero il risparmio sui prodotti. Conviene comprare tutto in un unico negozio.
             </p>
         </div>
         """, unsafe_allow_html=True)
         
     st.write("---")
     
-    # Elenco tradizionale unico negozio
-    st.markdown("""
-    <div class="title-with-icon">
-        <span style="font-size: 20px;">🏪 Ordinare da un'unica farmacia:</span>
-    </div>
-    """, unsafe_allow_html=True)
+    # Elenco farmacie singole
+    st.markdown('<div class="title-with-icon">🏪 Ordinare da un\'unica farmacia:</div>', unsafe_allow_html=True)
     
     for i, row in enumerate(df_risultati_singoli.itertuples()):
         is_vincitore = (i == 0 and not best_split_arrangement)
         card_class = "vincitore-card" if is_vincitore else "farmacia-card"
         prezzo_color = "#22c55e" if is_vincitore else "#1e3a8a"
         
-        if i == 0:
-            badge_svg = '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#22c55e" stroke-width="2.5"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>'
-        elif i == 1:
-            badge_svg = '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#64748b" stroke-width="2.5"><circle cx="12" cy="12" r="10"/></svg>'
-        else:
-            badge_svg = '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="2.5"><circle cx="12" cy="12" r="10"/></svg>'
-            
         st.markdown(f"""
         <div class="{card_class}">
             <div style="font-size: 24px; font-weight: 800; float: right; color: {prezzo_color};">{row.Prezzo_Finale:.2f} €</div>
-            <div style="font-size: 17px; font-weight: bold; color: #1e3a8a; display: flex; align-items: center; gap: 8px;">
-                {badge_svg} {row.Farmacia}
+            <div style="font-size: 17px; font-weight: bold; color: #1e3a8a;">
+                🏢 {row.Farmacia}
             </div>
             <div style="font-size: 13px; color: #64748b; margin-top: 6px;">
                 Prodotti: {row.Totale_Prodotti:.2f} € | {row.Info_Spedizione}
             </div>
         """, unsafe_allow_html=True)
-        
         if row.Suggerimento:
             st.markdown(row.Suggerimento, unsafe_allow_html=True)
         st.markdown("</div>", unsafe_allow_html=True)
-        
-        with st.expander(f"📋 Dettaglio listino prezzi {row.Farmacia}"):
-            df_singolo = df_filtrato[["Prodotto", row.Farmacia]].copy()
-            df_singolo.columns = ["Prodotto", "Prezzo (€)"]
-            st.dataframe(df_singolo, use_container_width=True, hide_index=True)

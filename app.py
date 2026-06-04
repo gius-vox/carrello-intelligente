@@ -10,7 +10,7 @@ st.set_page_config(
     layout="centered"
 )
 
-# 2. Iniezione CSS globale coordinata con i NUOVI colori del logo (Rosso Granata Sfumato e Azzurro Ciano)
+# 2. Iniezione CSS globale coordinata con i NUOVI colori del logo (Rosso e Azzurro)
 st.markdown("""
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Outfit:wght=400;600;800&display=swap');
@@ -30,8 +30,8 @@ html, body, [data-testid="stMarkdownContainer"] p {
 /* Card del negozio singolo più conveniente */
 .vincitore-card {
     background-color: #fff5f5 !important;
-    border: 2px solid #a21caf !important; /* Richiamo sfumatura scura del logo */
-    border-left: 6px solid #b91c1c !important; /* Rosso vivo */
+    border: 2px solid #b91c1c !important;
+    border-left: 6px solid #b91c1c !important;
     padding: 18px 20px !important;
     border-radius: 14px !important;
     margin-bottom: 16px !important;
@@ -40,7 +40,7 @@ html, body, [data-testid="stMarkdownContainer"] p {
 /* Card della strategia split (ordine diviso) */
 .split-card {
     background-color: #f0f9ff !important;
-    border: 2px solid #00a8cc !important; /* Azzurro Ciano del logo */
+    border: 2px solid #00a8cc !important;
     padding: 20px !important;
     border-radius: 14px !important;
     margin-bottom: 20px !important;
@@ -57,7 +57,7 @@ html, body, [data-testid="stMarkdownContainer"] p {
     display: flex;
     align-items: center;
     gap: 10px;
-    color: #b91c1c; /* Rosso principale per i titoli importanti */
+    color: #b91c1c;
     font-weight: 700;
     margin-top: 20px;
     margin-bottom: 15px;
@@ -66,15 +66,13 @@ html, body, [data-testid="stMarkdownContainer"] p {
 </style>
 """, unsafe_allow_html=True)
 
-# 3. CARICAMENTO LOGO NUOVO (SISTEMATO E INCORPORATO AUTOMATICAMENTE VIA URL)
-# Utilizza l'immagine caricata per mostrare il brand senza richiedere file locali
-url_logo = "https://raw.githubusercontent.com/alessandro-b9/immagini/main/logo_pulito.png"
+# 3. CARICAMENTO LOGO (URL Diretto all'immagine con sfondo trasparente e senza quadretti)
+logo_url = "https://i.imgur.com/vH6v97D.png"
 
-col_left, col_logo, col_right = st.columns([1, 1.5, 1])
+col_left, col_logo, col_right = st.columns([1, 1.2, 1])
 with col_logo:
-    # Mostra l'immagine direttamente dal web; se non è raggiungibile usa il testo di backup elegante
     try:
-        st.image("https://images.squarespace-cdn.com/content/v1/6463ba313c4a2233c1626f23/1684311855271-XCHVZZOPFFS2O6U5LFFB/logo.png", use_container_width=True)
+        st.image(logo_url, use_container_width=True)
     except:
         st.markdown("""
         <div style="text-align: center; margin-bottom: 10px;">
@@ -100,7 +98,7 @@ csv_path = "prodotti.csv"
 if os.path.exists(csv_path):
     df_prezzi = pd.read_csv(csv_path)
 else:
-    st.error("Errore critico: File 'prodotti.csv' non trovato. Assicurati che sia nella stessa cartella dello script.")
+    st.error("Errore critico: File 'prodotti.csv' non trovato.")
     st.stop()
 
 nomi_farmacie = [col for col in df_prezzi.columns if col not in ["Prodotto", "Immagine"]]
@@ -120,7 +118,7 @@ if "carrello_spesa" not in st.session_state:
     ]
 
 # --- SEZIONE: RICERCA PRODOTTO ---
-st.markdown("""<div class="title-with-icon">🔍 Cerca un prodotto nel database:</div>""", unsafe_allow_html=True)
+st.markdown('<div class="title-with-icon">🔍 Cerca un prodotto nel database:</div>', unsafe_allow_html=True)
 
 lista_prodotti = sorted(df_prezzi["Prodotto"].unique().tolist())
 cerca_testo = st.selectbox(
@@ -170,7 +168,7 @@ if cerca_testo != "":
 st.write("---")
 
 # --- RIEPILOGO DEL CARRELLO ---
-st.markdown("""<div class="title-with-icon">🛒 Il tuo carrello attuale:</div>""", unsafe_allow_html=True)
+st.markdown('<div class="title-with-icon">🛒 Il tuo carrello attuale:</div>', unsafe_allow_html=True)
 
 prodotti_selezionati = st.multiselect(
     "Puoi rimuovere gli elementi cliccando sulla 'x':",
@@ -198,7 +196,7 @@ if prodotti_selezionati:
         else:
             info_sped = f"Spedizione: {costo_spedizione:.2f}€"
             mancante = regole["soglia_gratis"] - totale_prodotti
-            suggerimento = f"""<div style='background-color: #fef08a; border-left: 4px solid #facc15; padding: 10px; font-size:13px; border-radius:4px; margin-top:8px;'>💡 Aggiungi <b>{mancante:.2f}€</b> su {nome_farmacia} per azzerare la spedizione!</div>"""
+            suggerimento = f"<div style='background-color: #fef08a; border-left: 4px solid #facc15; padding: 10px; font-size:13px; border-radius:4px; margin-top:8px;'>💡 Aggiungi <b>{mancante:.2f}€</b> su {nome_farmacia} per azzerare la spedizione!</div>"
         
         risultati_singoli.append({
             "Farmacia": nome_farmacia, 
@@ -235,7 +233,7 @@ if prodotti_selezionati:
 
     # --- VISUALIZZAZIONE SEZIONE INTELLIGENTE ---
     st.write("")
-    st.markdown("""<div class="title-with-icon">✨ Strategia d'Acquisto Intelligente:</div>""", unsafe_allow_html=True)
+    st.markdown('<div class="title-with-icon">✨ Strategia d'Acquisto Intelligente:</div>'.replace("d'Acquisto", "d\'Acquisto"), unsafe_allow_html=True)
     
     if best_split_arrangement:
         risparmio_netto = miglior_singolo - best_split_cost
@@ -269,7 +267,7 @@ if prodotti_selezionati:
     st.write("---")
     
     # Elenco farmacie singole
-    st.markdown("""<div class="title-with-icon">🏪 Ordinare da un'unica farmacia:</div>""", unsafe_allow_html=True)
+    st.markdown('<div class="title-with-icon">🏪 Ordinare da un\'unica farmacia:</div>', unsafe_allow_html=True)
     
     for row in df_risultati_singoli.itertuples():
         is_vincitore = (row.Index == 0 and not best_split_arrangement)

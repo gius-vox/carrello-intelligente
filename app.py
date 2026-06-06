@@ -66,7 +66,7 @@ html, body, [data-testid="stMarkdownContainer"] p {
 </style>
 """, unsafe_allow_html=True)
 
-# 3. Gestione Intestazione: PRIMA IL LOGO E POI IL TITOLO (Risolto l'errore di battitura!)
+# 3. Gestione Intestazione: PRIMA IL LOGO E POI IL TITOLO sempre visibili
 nomi_possibili_logo = ["logo carrellosnello.png", "Logo carrellosnello.png", "logo.png", "Logo.png"]
 logo_trovato = None
 
@@ -81,7 +81,7 @@ if logo_trovato:
     with col_logo:
         st.image(logo_trovato, use_container_width=True)
 
-# Il titolo principale ora compare SEMPRE e in modo fisso sotto il logo grafico
+# Il titolo principale compare sempre sotto il logo grafico
 st.markdown("""
 <div style="text-align: center; margin-top: 15px; margin-bottom: 5px;">
     <h1 style="color: #b91c1c; font-family: 'Outfit', sans-serif; font-size: 42px; font-weight: 800; letter-spacing: 1px; margin-bottom: 0px;">
@@ -173,7 +173,7 @@ if prodotti_selezionati:
             "Farmacia": nome_farmacia, 
             "Totale_Prodotti": totale_prodotti,
             "Info_Spedizione": info_sped, 
-            "Suggerimento": sugerimento, 
+            "Suggerimento": suggerimento, 
             "Prezzo_Finale": totale_complessivo
         })
         

@@ -1,6 +1,5 @@
 import streamlit as st
 import pandas as pd
-import itertools
 import os
 
 # 1. Impostazione della pagina nativa
@@ -140,7 +139,7 @@ prodotti_selezionati = st.multiselect(
 )
 st.session_state.carrello_spesa = prodotti_selezionati
 
-# --- CALCOLO CONVENIENZA CON OTTIMIZZAZIONE SPLIT ---
+# --- CALCOLO CONVENIENZA OTTIMIZZATO (FULMINEO) ---
 if prodotti_selezionati:
     df_filtrato = df_prezzi[df_prezzi["Prodotto"].isin(prodotti_selezionati)]
     
@@ -171,49 +170,42 @@ if prodotti_selezionati:
     df_risultati_singoli = pd.DataFrame(risultati_singoli).sort_values(by="Prezzo_Finale").reset_index(drop=True)
     miglior_negozio_singolo = df_risultati_singoli.iloc[0]["Prezzo_Finale"]
 
-    # B. Calcolo della Strategia Split Intelligente
-    miglior_combinazione_split = None
-    miglior_prezzo_split = miglior_negozio_singolo
+    # B. Calcolo Ottimizzato dello Split (Senza cicli esponenziali infiniti)
+    carrelli_split = {f: [] for f in nomi_farmacie}
+    
+    # Per ogni prodotto, individuiamo direttamente la farmacia con il prezzo più basso
+    for row in df_filtrato.itertuples():
+        prezzi_prodotto = {f: getattr(row, f.replace(" ", "_").replace(".", "_")) for f in nomi_farmacie if hasattr(row, f.replace(" ", "_").replace(".", "_"))}
+        if non prezzi_prodotto:
+            prezzi_prodotto = {f: row._asdict()[f] for f in nomi_farmacie if f in row._asdict()}
+        miglior_farmacia_prodotto = min(prezzi_prodotto, key=prezzi_prodotto.get)
+        carrelli_split[miglior_farmacia_prodotto].append(row.Prodotto)
 
-    # Generiamo tutte le distribuzioni possibili dei prodotti scelti sulle farmacie disponibili
-    prodotti_lista = list(df_filtrato["Prodotto"])
-    tutte_distribuzioni = itertools.product(nomi_farmacie, repeat=len(prodotti_lista))
-
-    for dist in tutte_distribuzioni:
-        carrelli_split = {f: [] for f in nomi_farmacie}
-        for prod, farm in zip(prodotti_lista, dist):
-            carrelli_split[farm].append(prod)
-            
-        costo_totale_split = 0.0
-        dettagli_assegnazione = {}
-        
-        for farm, prods_in_farm in carrelli_split.items():
-            if prods_in_farm:
-                sotto_df = df_filtrato[df_filtrato["Prodotto"].isin(prods_in_farm)]
-                prezzo_prodotti = float(sotto_df[farm].sum())
-                regole = farmacie_info[farm]
-                spedizione = 0.0 if prezzo_prodotti >= regole["soglia_gratis"] else regole["spedizione_fissa"]
-                costo_totale_split += (prezzo_prodotti + spedizione)
-                dettagli_assegnazione[farm] = {
-                    "prodotti": prods_in_farm,
-                    "prezzo_prodotti": prezzo_prodotti,
-                    "spedizione": spedizione
-                }
-                
-        # Controlliamo se questa combinazione mista batte il negozio singolo più economico
-        if costo_totale_split < miglior_prezzo_split - 0.05: # Margine minimo di 5 centesimi
-            miglior_prezzo_split = costo_totale_split
-            miglior_combinazione_split = dettagli_assegnazione
+    costo_totale_split = 0.0
+    dettagli_assegnazione = {}
+    
+    for farm, prods_in_farm in carrelli_split.items():
+        if prods_in_farm:
+            sotto_df = df_filtrato[df_filtrato["Prodotto"].isin(prods_in_farm)]
+            prezzo_prodotti = float(sotto_df[farm].sum())
+            regole = farmacie_info[farm]
+            spedizione = 0.0 if prezzo_prodotti >= regole["soglia_gratis"] else regole["spedizione_fissa"]
+            costo_totale_split += (prezzo_prodotti + spedizione)
+            dettagli_assegnazione[farm] = {
+                "prodotti": prods_in_farm,
+                "prezzo_prodotti": prezzo_prodotti,
+                "spedizione": spedizione
+            }
 
     st.write("---")
     st.markdown("""<div class="title-with-icon">🏪 Risultati del confronto delle Farmacie:</div>""", unsafe_allow_html=True)
     
-    # Se lo split conviene, mostriamo il suggerimento avanzato ad inizio elenco
-    if miglior_combinazione_split:
-        risparmio_generato = miglior_negozio_singolo - miglior_prezzo_split
+    # Mostriamo lo split solo se genera un risparmio effettivo rispetto al negozio singolo
+    if costo_totale_split < miglior_negozio_singolo - 0.05:
+        risparmio_generato = miglior_negozio_singolo - costo_totale_split
         st.markdown(f"""
         <div class="split-card">
-            <div style="font-size: 24px; font-weight: 800; float: right; color: #00a8cc;">{miglior_prezzo_split:.2f} €</div>
+            <div style="font-size: 24px; font-weight: 800; float: right; color: #00a8cc;">{costo_totale_split:.2f} €</div>
             <div style="font-size: 18px; font-weight: bold; color: #0c4a6e;">
                 💡 Strategia Split Consigliata!
             </div>
@@ -223,7 +215,7 @@ if prodotti_selezionati:
             <div style="font-size: 13px; color: #334155;">
         """, unsafe_allow_html=True)
         
-        for f_nome, dati in miglior_combinazione_split.items():
+        for f_nome, dati in dettagli_assegnazione.items():
             elenco_p = ", ".join([f"<b>{p}</b>" for p in dati["prodotti"]])
             info_s = "Spedizione Gratis" if dati["spedizione"] == 0.0 else f"Spedizione {dati['spedizione']:.2f}€"
             st.markdown(f"• Compra su **{f_nome}** ({info_s}): {elenco_p} → *Prodotti: {dati['prezzo_prodotti']:.2f}€*", unsafe_allow_html=True)

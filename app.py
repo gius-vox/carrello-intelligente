@@ -66,7 +66,7 @@ html, body, [data-testid="stMarkdownContainer"] p {
 </style>
 """, unsafe_allow_html=True)
 
-# 3. Gestione Titolo e Logo Locali (Scansione automatica e tollerante)
+# 3. Gestione Intelligente dell'Intestazione (PRIMA IL LOGO GRAFICO)
 nomi_possibili_logo = ["logo carrellosnello.png", "Logo carrellosnello.png", "logo.png", "Logo.png"]
 logo_trovato = None
 
@@ -75,25 +75,25 @@ for nome in nomi_possibili_logo:
         logo_trovato = nome
         break
 
-# Mostriamo il titolo di backup in stile testo
-st.markdown("""
-<div style="text-align: center; margin-bottom: 5px; padding-top: 10px;">
-    <h1 style="color: #b91c1c; font-family: 'Outfit', sans-serif; font-size: 40px; font-weight: 800; letter-spacing: 1px; margin-bottom: 0px;">
-        CARRELLO<span style="color: #00a8cc;">SNELLO</span>
-    </h1>
-</div>
-""", unsafe_allow_html=True)
-
-# Se l'immagine esiste, la inserisce sotto il titolo testuale
 if logo_trovato:
+    # Mostra l'immagine come primissima cosa in alto
     col_left, col_logo, col_right = st.columns([1, 2, 1])
     with col_logo:
         st.image(logo_trovato, use_container_width=True)
+else:
+    # Se l'immagine non viene trovata, usa il testo colorato di backup
+    st.markdown("""
+    <div style="text-align: center; margin-bottom: 5px; padding-top: 10px;">
+        <h1 style="color: #b91c1c; font-family: 'Outfit', sans-serif; font-size: 40px; font-weight: 800; letter-spacing: 1px; margin-bottom: 0px;">
+            CARRELLO<span style="color: #00a8cc;">SNELLO</span>
+        </h1>
+    </div>
+    """, unsafe_allow_html=True)
 
-# Slogan della piattaforma
+# Slogan sotto il logo
 st.markdown("""
 <div style="text-align: center; margin-bottom: 25px;">
-    <p style="color: #475569; font-family: 'Outfit', sans-serif; font-size: 13px; font-weight: 500; letter-spacing: 3px; text-transform: uppercase; margin-top: 5px; margin-bottom: 20px;">
+    <p style="color: #475569; font-family: 'Outfit', sans-serif; font-size: 13px; font-weight: 500; letter-spacing: 3px; text-transform: uppercase; margin-top: 15px; margin-bottom: 20px;">
         L'algoritmo intelligente per la tua spesa online
     </p>
 </div>

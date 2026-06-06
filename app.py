@@ -66,34 +66,34 @@ html, body, [data-testid="stMarkdownContainer"] p {
 </style>
 """, unsafe_allow_html=True)
 
-# 3. Gestione Intelligente dell'Intestazione (PRIMA IL LOGO GRAFICO)
+# 3. Gestione Intestazione: PRIMA IL LOGO E POI IL TITOLO sempre visibili
 nomi_possibili_logo = ["logo carrellosnello.png", "Logo carrellosnello.png", "logo.png", "Logo.png"]
 logo_trovato = None
 
-for nome in nomi_possibili_logo:
+for nome in nomi_possibles_logo:
     if os.path.exists(nome):
         logo_trovato = nome
         break
 
+# Se trova l'immagine, la mette in cima centrata
 if logo_trovato:
-    # Mostra l'immagine come primissima cosa in alto
     col_left, col_logo, col_right = st.columns([1, 2, 1])
     with col_logo:
         st.image(logo_trovato, use_container_width=True)
-else:
-    # Se l'immagine non viene trovata, usa il testo colorato di backup
-    st.markdown("""
-    <div style="text-align: center; margin-bottom: 5px; padding-top: 10px;">
-        <h1 style="color: #b91c1c; font-family: 'Outfit', sans-serif; font-size: 40px; font-weight: 800; letter-spacing: 1px; margin-bottom: 0px;">
-            CARRELLO<span style="color: #00a8cc;">SNELLO</span>
-        </h1>
-    </div>
-    """, unsafe_allow_html=True)
 
-# Slogan sotto il logo
+# Il titolo principale compare SEMPRE subito sotto il logo grafico
+st.markdown("""
+<div style="text-align: center; margin-top: 15px; margin-bottom: 5px;">
+    <h1 style="color: #b91c1c; font-family: 'Outfit', sans-serif; font-size: 42px; font-weight: 800; letter-spacing: 1px; margin-bottom: 0px;">
+        CARRELLO<span style="color: #00a8cc;">SNELLO</span>
+    </h1>
+</div>
+""", unsafe_allow_html=True)
+
+# Slogan sotto il titolo testuale
 st.markdown("""
 <div style="text-align: center; margin-bottom: 25px;">
-    <p style="color: #475569; font-family: 'Outfit', sans-serif; font-size: 13px; font-weight: 500; letter-spacing: 3px; text-transform: uppercase; margin-top: 15px; margin-bottom: 20px;">
+    <p style="color: #475569; font-family: 'Outfit', sans-serif; font-size: 13px; font-weight: 500; letter-spacing: 3px; text-transform: uppercase; margin-top: 5px; margin-bottom: 20px;">
         L'algoritmo intelligente per la tua spesa online
     </p>
 </div>

@@ -170,13 +170,12 @@ if prodotti_selezionati:
     df_risultati_singoli = pd.DataFrame(risultati_singoli).sort_values(by="Prezzo_Finale").reset_index(drop=True)
     miglior_negozio_singolo = df_risultati_singoli.iloc[0]["Prezzo_Finale"]
 
-    # B. Calcolo Ottimizzato dello Split (Senza cicli esponenziali infiniti)
+    # B. Calcolo Ottimizzato dello Split (Risolto l'errore del 'not')
     carrelli_split = {f: [] for f in nomi_farmacie}
     
-    # Per ogni prodotto, individuiamo direttamente la farmacia con il prezzo più basso
     for row in df_filtrato.itertuples():
         prezzi_prodotto = {f: getattr(row, f.replace(" ", "_").replace(".", "_")) for f in nomi_farmacie if hasattr(row, f.replace(" ", "_").replace(".", "_"))}
-        if non prezzi_prodotto:
+        if not prezzi_prodotto:
             prezzi_prodotto = {f: row._asdict()[f] for f in nomi_farmacie if f in row._asdict()}
         miglior_farmacia_prodotto = min(prezzi_prodotto, key=prezzi_prodotto.get)
         carrelli_split[miglior_farmacia_prodotto].append(row.Prodotto)

@@ -66,21 +66,29 @@ html, body, [data-testid="stMarkdownContainer"] p {
 </style>
 """, unsafe_allow_html=True)
 
-# 3. Caricamento Logo Locale che hai appena caricato
-logo_locale = "logo carrellosnello.png"
+# 3. Gestione Titolo e Logo Locali (Scansione automatica e tollerante)
+nomi_possibili_logo = ["logo carrellosnello.png", "Logo carrellosnello.png", "logo.png", "Logo.png"]
+logo_trovato = None
 
-if os.path.exists(logo_locale):
+for nome in nomi_possibili_logo:
+    if os.path.exists(nome):
+        logo_trovato = nome
+        break
+
+# Mostriamo il titolo di backup in stile testo
+st.markdown("""
+<div style="text-align: center; margin-bottom: 5px; padding-top: 10px;">
+    <h1 style="color: #b91c1c; font-family: 'Outfit', sans-serif; font-size: 40px; font-weight: 800; letter-spacing: 1px; margin-bottom: 0px;">
+        CARRELLO<span style="color: #00a8cc;">SNELLO</span>
+    </h1>
+</div>
+""", unsafe_allow_html=True)
+
+# Se l'immagine esiste, la inserisce sotto il titolo testuale
+if logo_trovato:
     col_left, col_logo, col_right = st.columns([1, 2, 1])
     with col_logo:
-        st.image(logo_locale, use_container_width=True)
-else:
-    st.markdown("""
-    <div style="text-align: center; margin-bottom: 5px; padding-top: 10px;">
-        <h1 style="color: #b91c1c; font-family: 'Outfit', sans-serif; font-size: 40px; font-weight: 800; letter-spacing: 1px; margin-bottom: 0px;">
-            CARRELLO<span style="color: #00a8cc;">SNELLO</span>
-        </h1>
-    </div>
-    """, unsafe_allow_html=True)
+        st.image(logo_trovato, use_container_width=True)
 
 # Slogan della piattaforma
 st.markdown("""
@@ -132,7 +140,7 @@ if cerca_testo != "":
             st.session_state.carrello_spesa.append(prod)
             st.rerun()
 
-# --- IL TUO CARRELLO REALE ---
+# --- IL TUO CARRELLO ---
 st.markdown("""<div class="title-with-icon">🛒 Il tuo carrello attuale:</div>""", unsafe_allow_html=True)
 
 prodotti_selezionati = st.multiselect(

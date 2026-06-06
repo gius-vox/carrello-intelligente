@@ -46,13 +46,6 @@ html, body, [data-testid="stMarkdownContainer"] p {
     margin-bottom: 20px !important;
     box-shadow: 0 10px 15px -3px rgba(0, 168, 204, 0.1) !important;
 }
-.split-card-info {
-    background-color: #f8fafc !important;
-    border: 2px dashed #cbd5e1 !important;
-    padding: 20px !important;
-    border-radius: 14px !important;
-    margin-bottom: 20px !important;
-}
 .title-with-icon {
     display: flex;
     align-items: center;
@@ -75,13 +68,11 @@ for nome in nomi_possibili_logo:
         logo_trovato = nome
         break
 
-# Se trova l'immagine del logo, la inserisce centrata in cima
 if logo_trovato:
     col_left, col_logo, col_right = st.columns([1, 2, 1])
     with col_logo:
         st.image(logo_trovato, use_container_width=True)
 
-# Il titolo principale compare sempre sotto il logo grafico
 st.markdown("""
 <div style="text-align: center; margin-top: 15px; margin-bottom: 5px;">
     <h1 style="color: #b91c1c; font-family: 'Outfit', sans-serif; font-size: 42px; font-weight: 800; letter-spacing: 1px; margin-bottom: 0px;">
@@ -90,7 +81,6 @@ st.markdown("""
 </div>
 """, unsafe_allow_html=True)
 
-# Slogan sotto il titolo testuale
 st.markdown("""
 <div style="text-align: center; margin-bottom: 25px;">
     <p style="color: #475569; font-family: 'Outfit', sans-serif; font-size: 13px; font-weight: 500; letter-spacing: 3px; text-transform: uppercase; margin-top: 5px; margin-bottom: 20px;">
@@ -150,11 +140,12 @@ prodotti_selezionati = st.multiselect(
 )
 st.session_state.carrello_spesa = prodotti_selezionati
 
-# --- CALCOLO CONVENIENZA ---
+# --- CALCOLO CONVENIENZA CON OTTIMIZZAZIONE SPLIT ---
 if prodotti_selezionati:
     df_filtrato = df_prezzi[df_prezzi["Prodotto"].isin(prodotti_selezionati)]
-    risultati_singoli = []
     
+    # A. Calcolo dei risultati per i negozi singoli
+    risultati_singoli = []
     for nome_farmacia in nomi_farmacie:
         regole = farmacie_info[nome_farmacia]
         totale_prodotti = float(df_filtrato[nome_farmacia].sum())
@@ -178,14 +169,72 @@ if prodotti_selezionati:
         })
         
     df_risultati_singoli = pd.DataFrame(risultati_singoli).sort_values(by="Prezzo_Finale").reset_index(drop=True)
-    
+    miglior_negozio_singolo = df_risultati_singoli.iloc[0]["Prezzo_Finale"]
+
+    # B. Calcolo della Strategia Split Intelligente
+    miglior_combinazione_split = None
+    miglior_prezzo_split = miglior_negozio_singolo
+
+    # Generiamo tutte le distribuzioni possibili dei prodotti scelti sulle farmacie disponibili
+    prodotti_lista = list(df_filtrato["Prodotto"])
+    tutte_distribuzioni = itertools.product(nomi_farmacie, repeat=len(prodotti_lista))
+
+    for dist in tutte_distribuzioni:
+        carrelli_split = {f: [] for f in nomi_farmacie}
+        for prod, farm in zip(prodotti_lista, dist):
+            carrelli_split[farm].append(prod)
+            
+        costo_totale_split = 0.0
+        dettagli_assegnazione = {}
+        
+        for farm, prods_in_farm in carrelli_split.items():
+            if prods_in_farm:
+                sotto_df = df_filtrato[df_filtrato["Prodotto"].isin(prods_in_farm)]
+                prezzo_prodotti = float(sotto_df[farm].sum())
+                regole = farmacie_info[farm]
+                spedizione = 0.0 if prezzo_prodotti >= regole["soglia_gratis"] else regole["spedizione_fissa"]
+                costo_totale_split += (prezzo_prodotti + spedizione)
+                dettagli_assegnazione[farm] = {
+                    "prodotti": prods_in_farm,
+                    "prezzo_prodotti": prezzo_prodotti,
+                    "spedizione": spedizione
+                }
+                
+        # Controlliamo se questa combinazione mista batte il negozio singolo più economico
+        if costo_totale_split < miglior_prezzo_split - 0.05: # Margine minimo di 5 centesimi
+            miglior_prezzo_split = costo_totale_split
+            miglior_combinazione_split = dettagli_assegnazione
+
     st.write("---")
     st.markdown("""<div class="title-with-icon">🏪 Risultati del confronto delle Farmacie:</div>""", unsafe_allow_html=True)
     
+    # Se lo split conviene, mostriamo il suggerimento avanzato ad inizio elenco
+    if miglior_combinazione_split:
+        risparmio_generato = miglior_negozio_singolo - miglior_prezzo_split
+        st.markdown(f"""
+        <div class="split-card">
+            <div style="font-size: 24px; font-weight: 800; float: right; color: #00a8cc;">{miglior_prezzo_split:.2f} €</div>
+            <div style="font-size: 18px; font-weight: bold; color: #0c4a6e;">
+                💡 Strategia Split Consigliata!
+            </div>
+            <div style="font-size: 14px; color: #0284c7; font-weight: 600; margin-top: 2px; margin-bottom: 12px;">
+                Dividendo l'ordine risparmi ancora {risparmio_generato:.2f} € rispetto al negozio singolo più economico!
+            </div>
+            <div style="font-size: 13px; color: #334155;">
+        """, unsafe_allow_html=True)
+        
+        for f_nome, dati in miglior_combinazione_split.items():
+            elenco_p = ", ".join([f"<b>{p}</b>" for p in dati["prodotti"]])
+            info_s = "Spedizione Gratis" if dati["spedizione"] == 0.0 else f"Spedizione {dati['spedizione']:.2f}€"
+            st.markdown(f"• Compra su **{f_nome}** ({info_s}): {elenco_p} → *Prodotti: {dati['prezzo_prodotti']:.2f}€*", unsafe_allow_html=True)
+            
+        st.markdown("</div></div>", unsafe_allow_html=True)
+
+    # Elenco classico dei negozi singoli ordinati dal più conveniente
     for row in df_risultati_singoli.itertuples():
         card_class = "vincitore-card" if row.Index == 0 else "farmacia-card"
         prezzo_color = "#b91c1c" if row.Index == 0 else "#1e293b"
-        prefisso = "🏆 Più conveniente: " if row.Index == 0 else ""
+        prefisso = "🏆 Più conveniente (ordine unico): " if row.Index == 0 else ""
         
         st.markdown(f"""
         <div class="{card_class}">

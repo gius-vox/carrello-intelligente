@@ -2,9 +2,9 @@ import streamlit as st
 import pandas as pd
 import os
 
-# 1. Impostazione della pagina nativa
+# 1. Impostazione della pagina nativa con il nuovo nome
 st.set_page_config(
-    page_title="CarrelloSnello - Il tuo carrello ottimizzato",
+    page_title="ComparaCarrello - Il tuo carrello ottimizzato",
     page_icon="🛒",
     layout="centered"
 )
@@ -72,10 +72,11 @@ if logo_trovato:
     with col_logo:
         st.image(logo_trovato, use_container_width=True)
 
+# Nuovo Titolo Ufficiale del Brand
 st.markdown("""
 <div style="text-align: center; margin-top: 15px; margin-bottom: 5px;">
     <h1 style="color: #b91c1c; font-family: 'Outfit', sans-serif; font-size: 42px; font-weight: 800; letter-spacing: 1px; margin-bottom: 0px;">
-        CARRELLO<span style="color: #00a8cc;">SNELLO</span>
+        COMPARA<span style="color: #00a8cc;">CARRELLO</span>
     </h1>
 </div>
 """, unsafe_allow_html=True)
@@ -139,7 +140,7 @@ prodotti_selezionati = st.multiselect(
 )
 st.session_state.carrello_spesa = prodotti_selezionati
 
-# --- CALCOLO CONVENIENZA OTTIMIZZATO ---
+# --- CALCOLO CONVENIENZA ---
 if prodotti_selezionati:
     df_filtrato = df_prezzi[df_prezzi["Prodotto"].isin(prodotti_selezionati)]
     
@@ -170,11 +171,10 @@ if prodotti_selezionati:
     df_risultati_singoli = pd.DataFrame(risultati_singoli).sort_values(by="Prezzo_Finale").reset_index(drop=True)
     miglior_negozio_singolo = df_risultati_singoli.iloc[0]["Prezzo_Finale"]
 
-    # B. Calcolo Ottimizzato dello Split Sicuro (Utilizza .iterrows() per mantenere intatti i nomi delle colonne)
+    # B. Calcolo Ottimizzato dello Split Sicuro (con iterrows per i caratteri speciali nelle colonne)
     carrelli_split = {f: [] for f in nomi_farmacie}
     
     for _, row in df_filtrato.iterrows():
-        # Creiamo il dizionario estraendo i valori direttamente dalle chiavi stringa del dizionario della riga
         prezzi_prodotto = {f: float(row[f]) for f in nomi_farmacie if f in row and pd.notna(row[f])}
         
         if prezzi_prodotto:
